@@ -1,0 +1,9 @@
+@import './base.css';
+@import 'primeicons/primeicons.css';
+
+#app {
+  max-width: none;
+  margin: 0 auto;
+  padding: 2rem;
+  font-weight: normal;
+}

@@ -1,0 +1,39 @@
+/* Shared dashboard card base styles (factored out from HomeDashboard.vue)
+   Controls the neutral shell inner layout so child components provide only content/layout.
+*/
+
+/* Force inner component roots to be visually transparent so the shell controls the surface */
+.widget-card > * {
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 100%;
+  height: 100%;
+  padding: 14px;
+  box-sizing: border-box;
+}
+
+/* Compact preview layout (no inner inset panel) */
+.widget-card .compact-peek {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Shared pill / data-peak styling */
+.widget-card .compact-due,
+.widget-card .data-peak {
+  background: var(--module-color, #7f8c8d);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
+/* Title padding inside widget (keeps visual alignment) */
+.widget-card .widget-title {
+  padding-left: 8px;
+}

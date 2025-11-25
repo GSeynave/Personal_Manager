@@ -1,0 +1,160 @@
+# ===========================
+# Personal Manager - .gitignore
+# ===========================
+
+# ===========================
+# General
+# ===========================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+
+# ===========================
+# Environment Files
+# ===========================
+.env
+.env.*
+.env.local
+.env.*.local
+.env.development
+.env.production
+*.env
+server/env-*.env
+docker/*.env
+
+# ===========================
+# Vue.js / UI (Frontend)
+# ===========================
+ui/node_modules/
+ui/dist/
+ui/dist-ssr/
+ui/.vite/
+ui/.cache/
+ui/coverage/
+ui/*.local
+ui/npm-debug.log*
+ui/yarn-debug.log*
+ui/yarn-error.log*
+ui/pnpm-debug.log*
+ui/lerna-debug.log*
+ui/.eslintcache
+ui/.npm
+ui/.yarn
+ui/.pnp
+ui/.pnp.js
+ui/tmp
+
+# ===========================
+# Java / Spring Boot / Maven
+# ===========================
+HELP.md
+target/
+server/target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+.mvn/wrapper/maven-wrapper.jar
+server/.mvn/wrapper/maven-wrapper.jar
+server/.mvn/timing.properties
+server/.mvn/wrapper/maven-wrapper.properties
+
+# Maven
+**/pom.xml.tag
+**/pom.xml.releaseBackup
+**/pom.xml.versionsBackup
+**/pom.xml.next
+**/release.properties
+**/dependency-reduced-pom.xml
+**/buildNumber.properties
+
+# Spring Boot
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+server/*.log
+server/*.gz
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+# ===========================
+# Docker
+# ===========================
+docker/*.log
+docker/data/
+docker/volumes/
+
+# ===========================
+# Database
+# ===========================
+*.db
+*.sqlite
+*.sqlite3
+*.h2.db
+
+# ===========================
+# OS Generated
+# ===========================
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# ===========================
+# Build artifacts
+# ===========================
+*.class
+
+# ===========================
+# Temporary files
+# ===========================
+tmp/
+temp/
+*.bak
+*.backup
+
+# ===========================
+# Secrets & Credentials
+# ===========================
+secrets/
+credentials/
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
