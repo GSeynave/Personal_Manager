@@ -23,43 +23,43 @@ Thumbs.db
 .env.development
 .env.production
 *.env
-server/env-*.env
+backend/env-*.env
 docker/*.env
 
 # ===========================
-# Vue.js / UI (Frontend)
+# Vue.js / frontend (Frontend)
 # ===========================
-ui/node_modules/
-ui/dist/
-ui/dist-ssr/
-ui/.vite/
-ui/.cache/
-ui/coverage/
-ui/*.local
-ui/npm-debug.log*
-ui/yarn-debug.log*
-ui/yarn-error.log*
-ui/pnpm-debug.log*
-ui/lerna-debug.log*
-ui/.eslintcache
-ui/.npm
-ui/.yarn
-ui/.pnp
-ui/.pnp.js
-ui/tmp
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
+frontend/.cache/
+frontend/coverage/
+frontend/*.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
+frontend/.eslintcache
+frontend/.npm
+frontend/.yarn
+frontend/.pnp
+frontend/.pnp.js
+frontend/tmp
 
 # ===========================
 # Java / Spring Boot / Maven
 # ===========================
 HELP.md
 target/
-server/target/
+backend/target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .mvn/wrapper/maven-wrapper.jar
-server/.mvn/wrapper/maven-wrapper.jar
-server/.mvn/timing.properties
-server/.mvn/wrapper/maven-wrapper.properties
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/.mvn/timing.properties
+backend/.mvn/wrapper/maven-wrapper.properties
 
 # Maven
 **/pom.xml.tag
@@ -68,7 +68,7 @@ server/.mvn/wrapper/maven-wrapper.properties
 **/pom.xml.next
 **/release.properties
 **/dependency-reduced-pom.xml
-**/buildNumber.properties
+**/bfrontendldNumber.properties
 
 # Spring Boot
 *.jar
@@ -78,8 +78,8 @@ server/.mvn/wrapper/maven-wrapper.properties
 *.zip
 *.tar.gz
 *.rar
-server/*.log
-server/*.gz
+backend/*.log
+backend/*.gz
 
 ### STS ###
 .apt_generated
@@ -96,16 +96,17 @@ server/*.gz
 *.iml
 *.ipr
 out/
+backend/.run/
 
 ### NetBeans ###
 /nbproject/private/
-/nbbuild/
+/nbbfrontendld/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+bfrontendld/
+!**/src/main/**/bfrontendld/
+!**/src/test/**/bfrontendld/
 
 ### VS Code ###
 .vscode/
@@ -136,7 +137,7 @@ ehthumbs.db
 Desktop.ini
 
 # ===========================
-# Build artifacts
+# Bfrontendld artifacts
 # ===========================
 *.class
 
