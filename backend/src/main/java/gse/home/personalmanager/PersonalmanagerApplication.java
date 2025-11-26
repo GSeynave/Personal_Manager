@@ -11,11 +11,13 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableFeignClients
 @EnableJpaRepositories(basePackages = {
         "gse.home.personalmanager.todo.infrastructure.repository",
-        "gse.home.personalmanager.accounting.infrastructure.repository"
+        "gse.home.personalmanager.accounting.infrastructure.repository",
+        "gse.home.personalmanager.shared.infrastructure.repository"
 })
 @EntityScan(basePackages = {
         "gse.home.personalmanager.todo.domain.model",
-        "gse.home.personalmanager.accounting.domain.model"
+        "gse.home.personalmanager.accounting.domain.model",
+        "gse.home.personalmanager.shared.model"
 })
 @ComponentScan(basePackages = "gse.home.personalmanager")
 public class PersonalmanagerApplication {

@@ -28,4 +28,18 @@ import { useThemeStore } from './stores/theme'
 const themeStore = useThemeStore()
 themeStore.init()
 
+// Initialize auth store
+import { useAuthStore } from './stores/auth'
+import FirebaseService from './services/FirebaseService'
+import { setupAxiosInterceptor } from './services/axiosInterceptor'
+
+// Initialize Firebase immediately
+FirebaseService.initFirebase()
+
+const authStore = useAuthStore()
+authStore.initialize()
+
+// Setup axios interceptor to add auth tokens to requests
+setupAxiosInterceptor()
+
 app.mount('#app')

@@ -1,24 +1,27 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
+import { useAuthStore } from '@/stores/auth'
 
+const router = useRouter()
+const authStore = useAuthStore()
 const isUserMenuOpen = ref(false)
-const isLoggedIn = ref(false)
 
 const toggleUserMenu = () => {
   isUserMenuOpen.value = !isUserMenuOpen.value
 }
 
-const logout = () => {
-  isLoggedIn.value = false
+const handleLogout = async () => {
+  await authStore.logout()
   isUserMenuOpen.value = false
+  router.push('/')
 }
 
-const login = () => {
-  isLoggedIn.value = true
-  isUserMenuOpen.value = false
+const handleLogin = () => {
+  router.push('/login')
 }
+
 // theme
 const themeStore = useThemeStore()
 const toggleTheme = () => themeStore.toggle()
@@ -44,18 +47,18 @@ const toggleTheme = () => themeStore.toggle()
           <span v-else>☀️</span>
         </button>
         <div class="user-section">
-          <button v-if="!isLoggedIn" class="btn-login" @click="login">Login</button>
+          <button v-if="!authStore.isAuthenticated" class="btn-login" @click="handleLogin">Login</button>
           <div v-else class="user-menu-wrapper">
             <button class="user-profile-btn" @click="toggleUserMenu">
               <span class="profile-icon">👤</span>
-              <span class="username">John Doe</span>
+              <span class="username">{{ authStore.userEmail }}</span>
               <span class="dropdown-icon" :class="{ open: isUserMenuOpen }">▼</span>
             </button>
             <div v-if="isUserMenuOpen" class="user-dropdown">
               <a href="#" class="dropdown-item">Profile</a>
               <a href="#" class="dropdown-item">Settings</a>
               <hr class="dropdown-divider" />
-              <button class="dropdown-item logout-btn" @click="logout">Logout</button>
+              <button class="dropdown-item logout-btn" @click="handleLogout">Logout</button>
             </div>
           </div>
         </div>

@@ -1,10 +1,12 @@
 package gse.home.personalmanager.todo.application;
 
+import gse.home.personalmanager.shared.model.AppUserPrincipal;
 import gse.home.personalmanager.todo.application.dto.TodoDTO;
 import gse.home.personalmanager.todo.application.service.TodoUseCaseService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +21,11 @@ public class TodoController {
 
     @GetMapping
     public ResponseEntity<List<TodoDTO>> getTodos() {
-        log.info("Request to get all todos");
+        AppUserPrincipal user = (AppUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("Request to get all todos for user: {}", user.getUser().getId());
+        log.info("Request to get all todos for user: {}", user.getUser().getEmail());
+        log.info("Request to get all todos for user: {}", user.getUser().getFirebaseUid());
+
         return ResponseEntity.ok(useCaseService.getAllTodos());
     }
 
