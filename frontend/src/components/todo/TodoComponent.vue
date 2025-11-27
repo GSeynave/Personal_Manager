@@ -17,6 +17,17 @@ function deleteTodo() {
   emit('onDeleteTodo', { id: props.id })
 }
 
+function formatDate(date: Date | null): string {
+  if (!date) return ''
+  
+  const d = new Date(date)
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  
+  return `${year}-${month}-${day}`
+}
+
 // Map available images in `src/assets/images` at build time.
 // We use import.meta.glob with { eager: true, as: 'url' } so Vite returns
 // a map of file paths -> resolved URLs. This makes lookups safe and
@@ -48,6 +59,12 @@ function getAssigneeImage(name: string | null) {
 
 <template>
   <div :class="['todo-item', { completed: props.completed }]" @click="onToggleCompletion">
+    <span class="delete-icon" @click.stop="deleteTodo()">
+      <i
+        class="pi pi-times"
+        style="font-size: 1.2em; color: #e00b0bff; cursor: pointer"
+      ></i>
+    </span>
     <div>
       <span class="completion-icon">
         <i
@@ -57,42 +74,38 @@ function getAssigneeImage(name: string | null) {
         ></i>
         <i
           v-else
-          class="pi pi-times"
-          style="font-size: 1em; margin-right: 0.3em; color: #e00b0bff"
+          class="pi pi-circle"
+          style="font-size: 1em; margin-right: 0.3em; color: #999"
         ></i>
       </span>
       <span class="todo-title">
         {{ props.title }}
       </span>
-      <span class="delete-icon">
-        <i
-          class="pi pi-trash"
-          style="font-size: 1em; margin-right: 0.3em; cursor: pointer"
-          @click="deleteTodo()"
-        ></i>
-      </span>
     </div>
     <div class="todo-details">
-      <div v-if="props.assigned_to === 'BOTH'">
+      <div v-if="props.assigned_to === 'BOTH'" class="assignee-images">
         <img
           class="assignee-img"
           :alt="props.assigned_to || 'Unassigned'"
+          :title="props.assigned_to || 'Unassigned'"
           :src="getAssigneeImage('PHONWALAI')"
         />
         <img
           class="assignee-img"
           :alt="props.assigned_to || 'Unassigned'"
+          :title="props.assigned_to || 'Unassigned'"
           :src="getAssigneeImage('GAUTHIER')"
-        />{{ props.assigned_to }}
+        />
       </div>
-      <div class="assigned-to" v-else>
+      <div class="assignee-images" v-else>
         <img
           class="assignee-img"
           :alt="props.assigned_to || 'Unassigned'"
+          :title="props.assigned_to || 'Unassigned'"
           :src="getAssigneeImage(props.assigned_to)"
-        />{{ props.assigned_to }}
+        />
       </div>
-      <div class="due-date">{{ props.due_date }}</div>
+      <div class="due-date">{{ formatDate(props.due_date) }}</div>
     </div>
   </div>
 </template>
@@ -105,9 +118,12 @@ function getAssigneeImage(name: string | null) {
 }
 .todo-item {
   padding: 0.5rem;
+  padding-right: 1.5rem;
   border: 1px solid #eee;
   border-radius: 4px;
   margin: 0.5rem 0;
+  position: relative;
+  overflow: visible;
   cursor: pointer;
 }
 .completion-icon {
@@ -115,9 +131,19 @@ function getAssigneeImage(name: string | null) {
   margin-right: 0.5rem;
 }
 .delete-icon {
-  float: right;
+  position: absolute;
+  top: -8px;
+  right: -8px;
   cursor: pointer;
-  margin-left: 1rem;
+  z-index: 10;
+  background: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 .todo-title {
   font-weight: bold;
@@ -125,26 +151,27 @@ function getAssigneeImage(name: string | null) {
 .todo-details {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   gap: 0.5rem;
 }
 
-.assigned-to {
-  width: 50%;
-  text-align: left;
-  font-size: 0.8em;
-  color: #666;
+.assignee-images {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
 }
+
 .due-date {
-  width: 50%;
   text-align: right;
   font-size: 0.8em;
   color: #666;
 }
 .assignee-img {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  margin-right: 0.3rem;
   vertical-align: middle;
+  cursor: pointer;
 }
 </style>

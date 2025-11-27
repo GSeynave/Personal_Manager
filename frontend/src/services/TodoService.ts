@@ -12,12 +12,33 @@ export default class TodoService {
   }
 
   async addTodo(todo: Todo) {
-    const response = await axios.post(API_URL, todo);
+    // Prepare the payload for backend
+    const payload = {
+      title: todo.title,
+      enhancedTitle: todo.enhancedTitle || null,
+      due_date: todo.due_date,
+      completed: todo.completed,
+      assigned_to: todo.assigned_to
+    };
+    // Don't send id for creation
+    console.log('Adding todo:', JSON.stringify(payload, null, 2));
+    const response = await axios.post(API_URL, payload);
     return response.data;
   }
 
   async updateTodo(todo: Todo) {
-    const response = await axios.put(`${API_URL}/${todo.id}`, todo);
+    if (!todo.id) {
+      throw new Error('Todo ID is required for update');
+    }
+    const payload = {
+      id: todo.id,
+      title: todo.title,
+      enhancedTitle: todo.enhancedTitle || null,
+      due_date: todo.due_date,
+      completed: todo.completed,
+      assigned_to: todo.assigned_to
+    };
+    const response = await axios.put(`${API_URL}/${todo.id}`, payload);
     return response.data;
   }
 

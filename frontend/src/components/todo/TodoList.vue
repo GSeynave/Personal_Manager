@@ -1,80 +1,107 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import TodoService from '../../services/TodoService'
-import Todo from '@/model/Todo'
+import { onMounted } from 'vue'
+import { useTodoStore } from '@/stores/todo'
+import type { TodoFilter } from '@/stores/todo'
 import CardContent from '../Dashboard/CardContent.vue'
 import TodoComponent from './TodoComponent.vue'
 
-const todoService = new TodoService()
-const todos = ref<Todo[]>([])
-const fetchTodos = async () => {
-  try {
-    console.log('fetching todos...')
-    const data = await todoService.getTodos()
-    console.log('data retrieved', data)
-    todos.value = data
-  } catch (err) {
-    console.error('Error fetching todos:', err)
-  } finally {
-    console.info('Todo ended')
-  }
-}
+const todoStore = useTodoStore()
 
-const todoListSorted = computed(() => {
-  // Return a sorted shallow copy to avoid mutating the original reactive array
-  return todos.value.slice().sort((a, b) => {
-    if (a.completed !== b.completed) {
-      return a.completed ? 1 : -1 // Incomplete first
-    }
-    return 0 // Both have no due date
-  })
+onMounted(() => {
+  todoStore.fetchTodos()
 })
-
-async function toggleTodoCompletion(todo: Todo) {
-  try {
-    todo.completed = !todo.completed
-    await todoService.updateTodo(todo)
-    console.log('Todo updated', todo)
-  } catch (err) {
-    console.error('Error updating todo:', err)
-  }
-}
-async function deleteTodo(id: string) {
-  try {
-    await todoService.deleteTodo(id)
-    todos.value = todos.value.filter((todo) => todo.id !== id)
-    console.log('Todo deleted', id)
-  } catch (err) {
-    console.error('Error deleting todo:', err)
-  }
-}
-onMounted(fetchTodos)
 </script>
 
 <template>
   <CardContent :title="'Todo List'">
-    <p>This is the Todo List component.</p>
-    <div class="todo-item-container">
+    <div class="filters">
+      <button 
+        :class="{ active: todoStore.filter === 'all' }"
+        @click="todoStore.filter = 'all'"
+      >
+        All ({{ todoStore.todos.length }})
+      </button>
+      <button 
+        :class="{ active: todoStore.filter === 'active' }"
+        @click="todoStore.filter = 'active'"
+      >
+        Active ({{ todoStore.activeCount }})
+      </button>
+      <button 
+        :class="{ active: todoStore.filter === 'completed' }"
+        @click="todoStore.filter = 'completed'"
+      >
+        Completed ({{ todoStore.completedCount }})
+      </button>
+    </div>
+    
+    <p v-if="todoStore.isLoading">Loading todos...</p>
+    <p v-else-if="todoStore.error" class="error">{{ todoStore.error }}</p>
+    <div v-else class="todo-item-container">
       <TodoComponent
-        v-for="todo in todoListSorted"
+        v-for="todo in todoStore.filteredTodos"
         :key="todo.id"
-        :id="todo.id"
+        :id="String(todo.id)"
         :title="todo.title"
         :assigned_to="todo.assigned_to"
-        :due_date="todo.due_date"
+        :due_date="todo.due_date ? new Date(todo.due_date) : null"
         :completed="todo.completed"
-        @onToggleCompletion="toggleTodoCompletion(todo)"
-        @onDeleteTodo="deleteTodo(todo.id)"
+        @onToggleCompletion="todoStore.toggleCompletion(todo)"
+        @onDeleteTodo="todoStore.deleteTodo(todo.id!)"
       />
     </div>
   </CardContent>
 </template>
 
 <style scoped>
+.filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.filters button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filters button:hover {
+  background: var(--color-background-soft);
+}
+
+.filters button.active {
+  background: var(--color-background-mute);
+  border-color: var(--color-border-hover);
+  font-weight: 600;
+}
+
 .todo-item-container {
   margin-bottom: 0.5rem;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 1400px) {
+  .todo-item-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .todo-item-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .todo-item-container {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

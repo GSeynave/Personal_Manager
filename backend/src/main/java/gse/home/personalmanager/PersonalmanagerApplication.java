@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
@@ -12,14 +13,15 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = {
         "gse.home.personalmanager.todo.infrastructure.repository",
         "gse.home.personalmanager.accounting.infrastructure.repository",
-        "gse.home.personalmanager.shared.infrastructure.repository"
+        "gse.home.personalmanager.user.infrastructure.repository"
 })
 @EntityScan(basePackages = {
         "gse.home.personalmanager.todo.domain.model",
         "gse.home.personalmanager.accounting.domain.model",
-        "gse.home.personalmanager.shared.model"
+        "gse.home.personalmanager.user.domain.model"
 })
 @ComponentScan(basePackages = "gse.home.personalmanager")
+@EnableJpaAuditing
 public class PersonalmanagerApplication {
 
     public static void main(String[] args) {

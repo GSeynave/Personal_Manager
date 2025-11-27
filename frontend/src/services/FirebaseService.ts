@@ -83,7 +83,7 @@ class FirebaseService {
       if (!this.auth) {
         throw new Error("Firebase Auth not initialized");
       }
-      
+       
       const userCredential: UserCredential = await createUserWithEmailAndPassword(
         this.auth,
         email,

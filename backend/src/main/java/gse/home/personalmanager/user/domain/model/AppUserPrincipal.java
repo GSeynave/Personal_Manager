@@ -1,4 +1,4 @@
-package gse.home.personalmanager.shared.model;
+package gse.home.personalmanager.user.domain.model;
 
 
 import lombok.Getter;

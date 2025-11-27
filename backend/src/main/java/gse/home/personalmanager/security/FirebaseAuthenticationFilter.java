@@ -1,11 +1,11 @@
 package gse.home.personalmanager.security;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import gse.home.personalmanager.shared.application.service.UserService;
 import gse.home.personalmanager.shared.exception.FirebaseAuthException;
-import gse.home.personalmanager.shared.model.AppUser;
-import gse.home.personalmanager.shared.model.AppUserPrincipal;
 import gse.home.personalmanager.shared.utils.JwtUtils;
+import gse.home.personalmanager.user.application.service.UserAuthService;
+import gse.home.personalmanager.user.domain.model.AppUser;
+import gse.home.personalmanager.user.domain.model.AppUserPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,11 +20,11 @@ import java.io.IOException;
 @Component
 public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
-    private final UserService userService;
+    private final UserAuthService userAuthService;
 
-    public FirebaseAuthenticationFilter(JwtUtils jwtUtils, UserService userService) {
+    public FirebaseAuthenticationFilter(JwtUtils jwtUtils, UserAuthService userAuthService) {
         this.jwtUtils = jwtUtils;
-        this.userService = userService;
+        this.userAuthService = userAuthService;
     }
 
     protected void doFilterInternal(HttpServletRequest request,
@@ -43,7 +43,7 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
                 String email = decodedToken.getClaim("email").asString();
 
                 // 4. Load or create user in your database
-                AppUser user = userService.findOrCreateByFirebaseUid(firebaseUid, email);
+                AppUser user = userAuthService.findOrCreateByFirebaseUid(firebaseUid, email);
 
                 // 5. Create Spring Security authentication
                 AppUserPrincipal principal = new AppUserPrincipal(user);

@@ -24,9 +24,23 @@ async function handleSubmit() {
     : await authStore.login(email.value, password.value)
   
   if (result.success) {
-    // Redirect to originally requested page or home
-    const redirect = router.currentRoute.value.query.redirect as string
-    router.push(redirect || '/')
+    // Wait for identity to be fetched (with timeout)
+    let attempts = 0
+    const maxAttempts = 10
+    while (authStore.isIdentityLoading && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 100))
+      attempts++
+    }
+    
+    // Check if user has identity set
+    if (!authStore.hasIdentity) {
+      // Redirect to first-connection if no identity
+      router.push('/first-connection')
+    } else {
+      // Redirect to originally requested page or home
+      const redirect = router.currentRoute.value.query.redirect as string
+      router.push(redirect || '/')
+    }
   } else {
     errorMessage.value = result.error || 'Authentication failed'
   }
