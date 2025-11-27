@@ -1,6 +1,6 @@
-package gse.home.personalmanager.shared.infrastructure.repository;
+package gse.home.personalmanager.user.infrastructure.repository;
 
-import gse.home.personalmanager.shared.model.AppUser;
+import gse.home.personalmanager.user.domain.model.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,6 +8,6 @@ import java.util.Optional;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<AppUser, Integer> {
+public interface UserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findByFirebaseUid(String firebaseUid);
 }

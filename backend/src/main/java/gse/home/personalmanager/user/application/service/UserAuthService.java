@@ -1,17 +1,19 @@
-package gse.home.personalmanager.shared.application.service;
+package gse.home.personalmanager.user.application.service;
 
 
-import gse.home.personalmanager.shared.infrastructure.repository.UserRepository;
-import gse.home.personalmanager.shared.model.AppUser;
+import gse.home.personalmanager.user.domain.model.AppUser;
+import gse.home.personalmanager.user.infrastructure.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class UserService {
+public class UserAuthService {
 
     private final UserRepository userRepository;
 
+    @Transactional
     public AppUser findOrCreateByFirebaseUid(String firebaseUid, String email) {
         return userRepository.findByFirebaseUid(firebaseUid)
                 .orElseGet(() -> createNewUser(firebaseUid, email));

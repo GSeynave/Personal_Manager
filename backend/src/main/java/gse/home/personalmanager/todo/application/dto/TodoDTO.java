@@ -1,6 +1,5 @@
 package gse.home.personalmanager.todo.application.dto;
 
-import gse.home.personalmanager.todo.domain.model.HomeOwner;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -13,6 +12,6 @@ public class TodoDTO {
     private String enhancedTitle;
     private LocalDate due_date;
     private Boolean completed;
-    private HomeOwner assigned_to;
+    private String assigned_to;
 
 }

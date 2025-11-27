@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5434/personal_manager_dev
+    username: pm_dev_user
+    password: pm_dev_pwd
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  sql:
+    init:
+      mode: always
+
+logging:
+  level:
+    root: DEBUG
+    org.hibernate.SQL: DEBUG
+    gse.home.personalmanager: TRACE
+

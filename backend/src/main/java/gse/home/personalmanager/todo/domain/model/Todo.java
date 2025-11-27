@@ -1,10 +1,12 @@
 package gse.home.personalmanager.todo.domain.model;
 
+import gse.home.personalmanager.user.domain.model.AppUser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 
@@ -18,11 +20,12 @@ import java.time.LocalDate;
                 @Index(name = "idx_todo_title_due_date", columnList = "title, due_date"),
         }
 )
+@EntityListeners(AuditingEntityListener.class)
 public class Todo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id;
+    private Long id;
     @Temporal(TemporalType.DATE)
     @LastModifiedDate
     private LocalDate last_modified;
@@ -35,6 +38,13 @@ public class Todo {
     @Temporal(TemporalType.DATE)
     private LocalDate due_date;
     private Boolean completed;
-    private HomeOwner assigned_to;
+    // Later it will have to be a list of AppUser reference.
+    private String assigned_to;
+    @Version
+    private Long version;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private AppUser user;
 
 }

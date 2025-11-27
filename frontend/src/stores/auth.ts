@@ -2,17 +2,21 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import type { User } from 'firebase/auth'
 import FirebaseService from '@/services/FirebaseService'
+import UserService, { type UserIdentity } from '@/services/UserService'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
   const currentUser = ref<User | null>(null)
+  const userIdentity = ref<UserIdentity | null>(null)
   const isLoading = ref(true)
+  const isIdentityLoading = ref(false)
   const error = ref<string | null>(null)
 
   // Getters
   const isAuthenticated = computed(() => currentUser.value !== null)
   const userEmail = computed(() => currentUser.value?.email || null)
   const userId = computed(() => currentUser.value?.uid || null)
+  const hasIdentity = computed(() => userIdentity.value !== null && !!userIdentity.value.userTag)
 
   // Actions
   async function initialize() {
@@ -22,16 +26,38 @@ export const useAuthStore = defineStore('auth', () => {
     FirebaseService.initFirebase()
     
     // Set up auth state listener
-    FirebaseService.onAuthStateChange((user) => {
+    FirebaseService.onAuthStateChange(async (user) => {
       currentUser.value = user
-      isLoading.value = false
       
       if (user) {
         console.log('User authenticated:', user.email)
+        // Fetch user identity when authenticated
+        await fetchUserIdentity()
       } else {
         console.log('User not authenticated')
+        userIdentity.value = null
       }
+      
+      isLoading.value = false
     })
+  }
+
+  async function fetchUserIdentity() {
+    if (!currentUser.value) {
+      return
+    }
+
+    isIdentityLoading.value = true
+    try {
+      const userService = new UserService()
+      userIdentity.value = await userService.getUserIdentity()
+      console.log('User identity fetched:', userIdentity.value)
+    } catch (err) {
+      console.error('Error fetching user identity:', err)
+      userIdentity.value = null
+    } finally {
+      isIdentityLoading.value = false
+    }
   }
 
   async function login(email: string, password: string) {
@@ -87,6 +113,7 @@ export const useAuthStore = defineStore('auth', () => {
       
       if (result.success) {
         currentUser.value = null
+        userIdentity.value = null
         return { success: true }
       } else {
         error.value = result.error || 'Logout failed'
@@ -123,16 +150,20 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     // State
     currentUser,
+    userIdentity,
     isLoading,
+    isIdentityLoading,
     error,
     
     // Getters
     isAuthenticated,
+    hasIdentity,
     userEmail,
     userId,
     
     // Actions
     initialize,
+    fetchUserIdentity,
     login,
     signup,
     logout,

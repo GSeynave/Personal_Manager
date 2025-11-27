@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
 import { useAuthStore } from '@/stores/auth'
@@ -21,6 +21,16 @@ const handleLogout = async () => {
 const handleLogin = () => {
   router.push('/login')
 }
+
+const goToProfile = () => {
+  router.push('/profile')
+  isUserMenuOpen.value = false
+}
+
+// Display userTag if available, otherwise email
+const displayName = computed(() => {
+  return authStore.userIdentity?.userTag || authStore.userEmail || 'User'
+})
 
 // theme
 const themeStore = useThemeStore()
@@ -51,12 +61,11 @@ const toggleTheme = () => themeStore.toggle()
           <div v-else class="user-menu-wrapper">
             <button class="user-profile-btn" @click="toggleUserMenu">
               <span class="profile-icon">👤</span>
-              <span class="username">{{ authStore.userEmail }}</span>
+              <span class="username">{{ displayName }}</span>
               <span class="dropdown-icon" :class="{ open: isUserMenuOpen }">▼</span>
             </button>
             <div v-if="isUserMenuOpen" class="user-dropdown">
-              <a href="#" class="dropdown-item">Profile</a>
-              <a href="#" class="dropdown-item">Settings</a>
+              <button class="dropdown-item" @click="goToProfile">Profile</button>
               <hr class="dropdown-divider" />
               <button class="dropdown-item logout-btn" @click="handleLogout">Logout</button>
             </div>

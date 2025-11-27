@@ -16,37 +16,37 @@ const router = createRouter({
       path: '/todo',
       name: 'todo',
       component: TodoView,
-      meta: { requiresAuth: true }, // Protected route
+      meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
     },
     {
       path: '/accounting',
       name: 'accounting',
       component: AccountingView,
-      meta: { requiresAuth: true }, // Protected route
+      meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
     },
     {
       path: '/diet',
       name: 'diet',
       component: () => import('../views/DietView.vue'),
-      meta: { requiresAuth: true }, // Protected route
+      meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
     },
     {
       path: '/energy',
       name: 'energy',
       component: () => import('../views/EnergyView.vue'),
-      meta: { requiresAuth: true }, // Protected route
+      meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
     },
     {
       path: '/calendar',
       name: 'calendar',
       component: () => import('../views/CalendarView.vue'),
-      meta: { requiresAuth: true }, // Protected route
+      meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
     },
     {
       path: '/sleep',
       name: 'sleep',
       component: () => import('../views/SleepView.vue'),
-      meta: { requiresAuth: true }, // Protected route
+      meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
     },
     {
       path: '/about',
@@ -58,6 +58,18 @@ const router = createRouter({
       name: 'login',
       component: () => import('../views/LoginView.vue'),
       meta: { requiresGuest: true }, // Only for non-authenticated users
+    },
+    {
+      path: '/first-connection',
+      name: 'first-connection',
+      component: () => import('../views/FirstConnectionView.vue'),
+      meta: { requiresAuth: true, skipIdentityCheck: true }, // Requires auth but skips identity check
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../views/ProfileView.vue'),
+      meta: { requiresAuth: true }, // Requires auth but not identity
     },
   ],
 })
@@ -80,13 +92,46 @@ router.beforeEach((to, from, next) => {
   }
   
   function checkRoute() {
+    // Check authentication first
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {
       // Redirect to login if not authenticated
       next({ name: 'login', query: { redirect: to.fullPath } })
-    } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
-      // Redirect to home if already authenticated
+      return
+    }
+    
+    // If already authenticated and trying to access guest-only routes
+    if (to.meta.requiresGuest && authStore.isAuthenticated) {
       next({ name: 'home' })
+      return
+    }
+    
+    // Check user identity for protected routes (skip for first-connection and login)
+    if (to.meta.requiresIdentity && authStore.isAuthenticated) {
+      // Wait for identity to load if it's currently loading
+      if (authStore.isIdentityLoading) {
+        const unwatch = authStore.$subscribe(() => {
+          if (!authStore.isIdentityLoading) {
+            unwatch()
+            checkIdentity()
+          }
+        })
+        return
+      }
+      
+      checkIdentity()
+      return
+    }
+    
+    next()
+  }
+  
+  function checkIdentity() {
+    if (!authStore.hasIdentity) {
+      // Redirect to first connection if identity is not set
+      console.log('User identity not set, redirecting to first-connection')
+      next({ name: 'first-connection' })
     } else {
+      console.log('User identity set, proceeding to route', authStore.userIdentity)
       next()
     }
   }

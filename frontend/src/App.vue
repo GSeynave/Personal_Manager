@@ -1,7 +1,21 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
+import { computed } from 'vue'
 import TopNavbar from './components/TopNavbar.vue'
 import ModuleBar from './components/ModuleBar.vue'
+import { useAuthStore } from './stores/auth'
+
+const route = useRoute()
+const authStore = useAuthStore()
+
+// Hide ModuleBar on certain routes or when not authenticated
+const showModuleBar = computed(() => {
+  if (!authStore.isAuthenticated) {
+    return false
+  }
+  const hiddenRoutes = ['login', 'first-connection']
+  return !hiddenRoutes.includes(route.name as string)
+})
 </script>
 
 <template>
@@ -11,11 +25,11 @@ import ModuleBar from './components/ModuleBar.vue'
 
     <!-- Main Content Area -->
     <div class="main-content">
-      <!-- Left Module Bar -->
-      <ModuleBar />
+      <!-- Left Module Bar (hidden on login/first-connection) -->
+      <ModuleBar v-if="showModuleBar" />
 
       <!-- Page Content -->
-      <div class="page-container">
+      <div class="page-container" :class="{ 'full-width': !showModuleBar }">
         <RouterView />
       </div>
     </div>
@@ -42,6 +56,11 @@ import ModuleBar from './components/ModuleBar.vue'
   flex: 1;
   overflow-y: auto;
   padding: 20px;
+}
+
+.page-container.full-width {
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Scrollbar styling */

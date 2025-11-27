@@ -1,18 +1,37 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import TodoService from '../../services/TodoService'
+import { useTodoStore } from '@/stores/todo'
 import Todo from '@/model/Todo'
 import CardContent from '../Dashboard/CardContent.vue'
+import { useAuthStore } from '@/stores/auth'
 
-const todoService = new TodoService()
-const todoForm = ref<Todo>(new Todo('', '', new Date(), '', false))
+const todoStore = useTodoStore()
+const authStore = useAuthStore()
+
+const title = ref('')
+const dueDate = ref('')
 
 async function createTodo() {
   try {
-    await todoService.addTodo(todoForm.value!)
-    console.log('Todo created')
+    const userTag = authStore.userIdentity?.userTag || authStore.userEmail || ''
+    
+    const newTodo = new Todo(
+      title.value,
+      false,
+      undefined,
+      dueDate.value || null,
+      userTag
+    )
+    
+    console.log('Creating todo:', newTodo)
+    await todoStore.addTodo(newTodo)
+    console.log('Todo created successfully')
+    
+    // Clear form
+    title.value = ''
+    dueDate.value = ''
   } catch (err) {
-    console.error('Error updating todo:', err)
+    console.error('Error creating todo:', err)
   }
 }
 </script>
@@ -22,21 +41,15 @@ async function createTodo() {
     <form class="todo-form-container" @submit.prevent="createTodo">
       <div class="form-group">
         <label for="title">Title:</label>
-        <input type="text" id="title" v-model="todoForm.title" required />
+        <input type="text" id="title" v-model="title" required />
       </div>
       <div class="form-group">
         <label for="dueDate">Due Date:</label>
-        <input type="date" id="dueDate" v-model="todoForm.due_date" required />
+        <input type="date" id="dueDate" v-model="dueDate" />
       </div>
-      <div class="form-group">
-        <label for="assigned_to">Assigned To:</label>
-        <select type="select" id="assigned_to" v-model="todoForm.assigned_to" required>
-          <option value="PHONWALAI">Phonwalai</option>
-          <option value="GAUTHIER">Gauthier</option>
-          <option value="BOTH">Both</option>
-        </select>
-      </div>
-      <button type="submit" class="submit-button">Create Todo</button>
+      <button type="submit" class="submit-button" :disabled="todoStore.isLoading">
+        {{ todoStore.isLoading ? 'Creating...' : 'Create Todo' }}
+      </button>
     </form>
   </CardContent>
 </template>
