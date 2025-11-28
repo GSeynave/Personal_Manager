@@ -10,6 +10,7 @@ const authStore = useAuthStore()
 
 const title = ref('')
 const dueDate = ref('')
+const selectedGroupId = ref<number | undefined>(undefined)
 
 async function createTodo() {
   try {
@@ -23,13 +24,14 @@ async function createTodo() {
       userTag
     )
     
-    console.log('Creating todo:', newTodo)
-    await todoStore.addTodo(newTodo)
+    console.log('Creating todo:', newTodo, 'in group:', selectedGroupId.value)
+    await todoStore.addTodo(newTodo, selectedGroupId.value)
     console.log('Todo created successfully')
     
     // Clear form
     title.value = ''
     dueDate.value = ''
+    selectedGroupId.value = undefined
   } catch (err) {
     console.error('Error creating todo:', err)
   }
@@ -47,6 +49,15 @@ async function createTodo() {
         <label for="dueDate">Due Date:</label>
         <input type="date" id="dueDate" v-model="dueDate" />
       </div>
+      <div class="form-group">
+        <label for="group">Group:</label>
+        <select id="group" v-model="selectedGroupId">
+          <option :value="undefined">Ungrouped</option>
+          <option v-for="group in todoStore.groupedTodos" :key="group.id" :value="group.id">
+            {{ group.title }}
+          </option>
+        </select>
+      </div>
       <button type="submit" class="submit-button" :disabled="todoStore.isLoading">
         {{ todoStore.isLoading ? 'Creating...' : 'Create Todo' }}
       </button>
@@ -60,23 +71,76 @@ async function createTodo() {
   flex-direction: row;
   gap: 1rem;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1rem;
+  gap: 0.25rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.9em;
+}
+
+.form-group input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1em;
+  transition: all 0.2s;
+  min-width: 200px;
+}
+
+.form-group select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1em;
+  transition: all 0.2s;
+  min-width: 200px;
+  cursor: pointer;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(232, 149, 111, 0.1);
+}
+
+.form-group input:hover,
+.form-group select:hover {
+  border-color: var(--primary);
 }
 
 .submit-button {
-  align-self: flex-end;
-  padding: 0.5rem 1rem;
-  background-color: #4caf50;
-  color: white;
+  padding: 0.5rem 1.5rem;
+  background: var(--primary);
+  color: var(--surface);
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  align-self: center;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-size: 1em;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(232, 149, 111, 0.3);
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>

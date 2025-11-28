@@ -25,11 +25,7 @@ import TodoForm from '../components/todo/TodoForm.vue'
 main {
   padding: var(--spacing-lg, 24px);
   position: relative;
-  background: linear-gradient(
-    90deg,
-    rgba(var(--module-color-rgb, 106, 27, 154), var(--module-tint-alpha, 0.04)),
-    rgba(255, 255, 255, 0)
-  );
+  background: var(--bg);
   min-height: 100vh;
 }
 
@@ -40,7 +36,7 @@ main::before {
   top: 0;
   bottom: 0;
   width: 6px;
-  background: var(--module-color, #6a1b9a);
+  background: var(--primary);
   border-radius: 4px 0 0 4px;
 }
 

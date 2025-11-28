@@ -21,6 +21,33 @@
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 }
 
+/* Universal color palette - Light Theme */
+:root,
+[data-theme='light'] {
+  --primary: #E8956F;
+  --success: #7C9885;
+  --accent: #D4A574;
+  --bg: #FAF8F5;
+  --surface: #FFFFFF;
+  --text: #2D3436;
+  --text-secondary: #636E72;
+  --gentle-alert: #E89D6F;
+  --reflection: #9B8FB0;
+}
+
+/* Universal color palette - Dark Theme */
+[data-theme='dark'] {
+  --primary: #E8956F;
+  --success: #8FAA97;
+  --accent: #C9A568;
+  --bg: #1A1612;
+  --surface: #2A2520;
+  --text: #E8E6E3;
+  --text-secondary: #B8B5B0;
+  --gentle-alert: #E89D6F;
+  --reflection: #A89FC0;
+}
+
 /* semantic color variables for this project */
 :root {
   --color-background: var(--vt-c-white);
@@ -60,11 +87,11 @@
 
 body {
   min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-background);
+  color: var(--text);
+  background: var(--bg);
   transition:
-    color 0.5s,
-    background-color 0.5s;
+    color 0.3s,
+    background-color 0.3s;
   line-height: 1.6;
   font-family:
     Inter,

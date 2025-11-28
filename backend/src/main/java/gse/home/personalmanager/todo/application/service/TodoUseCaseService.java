@@ -1,8 +1,12 @@
 package gse.home.personalmanager.todo.application.service;
 
 import gse.home.personalmanager.todo.application.dto.TodoDTO;
+import gse.home.personalmanager.todo.application.dto.TodosViewDTO;
 import gse.home.personalmanager.todo.application.mapper.TodoMapper;
 import gse.home.personalmanager.todo.application.service.ai.TodoTitleEnhancer;
+import gse.home.personalmanager.todo.domain.model.TodoGroup;
+import gse.home.personalmanager.todo.domain.service.TodoService;
+import gse.home.personalmanager.todo.infrastructure.repository.TodoGroupRepository;
 import gse.home.personalmanager.todo.infrastructure.repository.TodoRepository;
 import gse.home.personalmanager.user.domain.model.AppUser;
 import gse.home.personalmanager.user.domain.model.AppUserPrincipal;
@@ -13,8 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -23,15 +25,17 @@ public class TodoUseCaseService {
     private final TodoRepository todoRepository;
     private final TodoMapper todoMapper;
     private final TodoTitleEnhancer todoTitleEnhancer;
+    private final TodoService todoService;
+    private final TodoGroupRepository todoGroupRepository;
 
-    public List<TodoDTO> getAllTodos() {
+    public TodosViewDTO getAllTodos() {
         var userId = getUserId();
         log.info("UseCaseService: Getting all todos for user id: {}.", userId);
-        return todoRepository.findAllByUserId(userId).stream()
-                .map(todoMapper::toDto)
-                .toList();
+        var todos = todoRepository.findAllByUserId(userId);
+        return todoService.getTodosView(todos);
     }
 
+    @Transactional
     public Long createTodo(final TodoDTO todoDTO) {
         log.info("UseCaseService: Creating a new todo");
         // Extract the enhanced title logic and apply it to the entity
@@ -40,6 +44,7 @@ public class TodoUseCaseService {
         var entity = todoMapper.toEntity(todoDTO);
 //        entity.setEnhancedTitle(enhancedTitle);
         entity.setUser(getUserReference());
+        entity.setTodoGroup(getTodoGroup(todoDTO.getTodoGroupId()));
 
         return todoRepository.save(entity).getId();
     }
@@ -60,6 +65,8 @@ public class TodoUseCaseService {
 
         entity.setCompleted(todoDTO.getCompleted());
 
+        entity.setTodoGroup(getTodoGroup(todoDTO.getTodoGroupId()));
+
         todoRepository.save(entity);
     }
 
@@ -77,6 +84,11 @@ public class TodoUseCaseService {
     public AppUser getUserReference() {
         var userId = getUserId();
         return entityManager.getReference(AppUser.class, userId);
-
     }
+
+    public TodoGroup getTodoGroup(Long id) {
+        if (id == null) return null;
+        return todoGroupRepository.findById(id).orElseThrow();
+    }
+
 }

@@ -1,6 +1,7 @@
 package gse.home.personalmanager.todo.application;
 
 import gse.home.personalmanager.todo.application.dto.TodoDTO;
+import gse.home.personalmanager.todo.application.dto.TodosViewDTO;
 import gse.home.personalmanager.todo.application.service.TodoUseCaseService;
 import gse.home.personalmanager.user.domain.model.AppUserPrincipal;
 import lombok.AllArgsConstructor;
@@ -9,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -21,7 +20,7 @@ public class TodoController {
     TodoUseCaseService useCaseService;
 
     @GetMapping
-    public ResponseEntity<List<TodoDTO>> getTodos() {
+    public ResponseEntity<TodosViewDTO> getTodos() {
         AppUserPrincipal user = (AppUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         log.info("Request to get all todos for user: {}", user.getUser().getId());
         log.info("Request to get all todos for user: {}", user.getUser().getEmail());

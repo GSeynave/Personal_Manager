@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const emit = defineEmits(['onToggleCompletion', 'onDeleteTodo'])
+import { ref } from 'vue'
+
+const emit = defineEmits(['onToggleCompletion', 'onDeleteTodo', 'onDragStart'])
 const props = defineProps<{
   id: string
   title: string
@@ -8,13 +10,46 @@ const props = defineProps<{
   completed: boolean
 }>()
 
+const isDragging = ref(false)
+
 function onToggleCompletion() {
   emit('onToggleCompletion', { id: props.id })
 }
 function deleteTodo() {
-  // Placeholder for delete functionality
   console.log(`Delete todo with id: ${props.id}`)
   emit('onDeleteTodo', { id: props.id })
+}
+
+function handleDragStart(event: DragEvent) {
+  isDragging.value = true
+  
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('todoId', props.id)
+    
+    // Create a custom drag image without background
+    const target = event.currentTarget as HTMLElement
+    if (target) {
+      const clone = target.cloneNode(true) as HTMLElement
+      clone.style.position = 'absolute'
+      clone.style.top = '-9999px'
+      clone.style.backgroundColor = 'transparent'
+      clone.style.opacity = '0.6'
+      document.body.appendChild(clone)
+      
+      event.dataTransfer.setDragImage(clone, -20, -20)
+      
+      // Remove clone after drag image is created
+      setTimeout(() => {
+        document.body.removeChild(clone)
+      }, 0)
+    }
+  }
+  emit('onDragStart', props.id, event)
+}
+
+function handleDragEnd() {
+  isDragging.value = false
 }
 
 function formatDate(date: Date | null): string {
@@ -58,11 +93,17 @@ function getAssigneeImage(name: string | null) {
 </script>
 
 <template>
-  <div :class="['todo-item', { completed: props.completed }]" @click="onToggleCompletion">
+  <div 
+    :class="['todo-item', { completed: props.completed, 'is-dragging-self': isDragging }]" 
+    draggable="true"
+    @dragstart="handleDragStart"
+    @dragend="handleDragEnd"
+    @click="onToggleCompletion"
+  >
     <span class="delete-icon" @click.stop="deleteTodo()">
       <i
         class="pi pi-times"
-        style="font-size: 1.2em; color: #e00b0bff; cursor: pointer"
+        style="font-size: 1.2em; cursor: pointer"
       ></i>
     </span>
     <div>
@@ -70,12 +111,12 @@ function getAssigneeImage(name: string | null) {
         <i
           v-if="props.completed"
           class="pi pi-check"
-          style="font-size: 1em; margin-right: 0.3em; color: #0e6e0bff"
+          :style="{ fontSize: '1em', marginRight: '0.3em', color: 'var(--success)' }"
         ></i>
         <i
           v-else
           class="pi pi-circle"
-          style="font-size: 1em; margin-right: 0.3em; color: #999"
+          :style="{ fontSize: '1em', marginRight: '0.3em', color: 'var(--text-secondary)' }"
         ></i>
       </span>
       <span class="todo-title">
@@ -112,19 +153,37 @@ function getAssigneeImage(name: string | null) {
 
 <style scoped>
 .todo-item.completed {
-  background-color: #d4edda;
+  background-color: var(--success);
+  opacity: 0.7;
   text-decoration: line-through;
-  color: #6c757d;
+  color: var(--text-secondary);
 }
 .todo-item {
   padding: 0.5rem;
   padding-right: 1.5rem;
-  border: 1px solid #eee;
-  border-radius: 4px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
   margin: 0.5rem 0;
   position: relative;
   overflow: visible;
-  cursor: pointer;
+  cursor: grab;
+  background: var(--surface);
+  color: var(--text);
+  transition: all 0.2s;
+}
+
+.todo-item.is-dragging-self {
+  opacity: 0.4 !important;
+  transform: scale(0.95);
+  cursor: grabbing !important;
+}
+
+.todo-item:active {
+  cursor: grabbing;
+}
+.todo-item:hover {
+  box-shadow: 0 2px 8px rgba(212, 165, 116, 0.2);
+  border-color: var(--primary);
 }
 .completion-icon {
   cursor: pointer;
@@ -132,21 +191,27 @@ function getAssigneeImage(name: string | null) {
 }
 .delete-icon {
   position: absolute;
-  top: -8px;
-  right: -8px;
+  top: 4px;
+  right: 4px;
   cursor: pointer;
   z-index: 10;
-  background: white;
+  background: var(--surface);
   border-radius: 50%;
   width: 24px;
   height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+.delete-icon:hover {
+  background: var(--gentle-alert);
+  transform: scale(1.1);
 }
 .todo-title {
-  font-weight: bold;
+  font-weight: 600;
+  color: var(--text);
 }
 .todo-details {
   display: flex;
@@ -154,6 +219,7 @@ function getAssigneeImage(name: string | null) {
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .assignee-images {
@@ -165,7 +231,7 @@ function getAssigneeImage(name: string | null) {
 .due-date {
   text-align: right;
   font-size: 0.8em;
-  color: #666;
+  color: var(--text-secondary);
 }
 .assignee-img {
   width: 20px;
@@ -173,5 +239,6 @@ function getAssigneeImage(name: string | null) {
   border-radius: 50%;
   vertical-align: middle;
   cursor: pointer;
+  border: 2px solid var(--accent);
 }
 </style>

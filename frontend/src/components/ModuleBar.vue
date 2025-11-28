@@ -185,14 +185,14 @@ const toggleCollapse = () => {
 <style scoped>
 .module-bar {
   width: 280px;
-  background: var(--bg-primary);
+  background: var(--surface);
   backdrop-filter: blur(10px);
-  border-right: 1px solid var(--border-light);
+  border-right: 1px solid var(--accent);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   transition: width var(--transition-slow);
-  box-shadow: 2px 0 var(--shadow-md);
+  box-shadow: 2px 0 0 rgba(0, 0, 0, 0.05);
   position: relative;
   z-index: 900;
 }
@@ -206,9 +206,9 @@ const toggleCollapse = () => {
   top: 0;
   width: 100%;
   padding: var(--spacing-md);
-  background: rgba(var(--primary-rgb), 0.1);
+  background: rgba(232, 149, 111, 0.1);
   border: none;
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--accent);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -217,7 +217,7 @@ const toggleCollapse = () => {
 }
 
 .collapse-btn:hover {
-  background: rgba(var(--primary-rgb), 0.15);
+  background: rgba(232, 149, 111, 0.15);
 }
 
 .collapse-icon {
@@ -245,19 +245,19 @@ const toggleCollapse = () => {
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--bg-secondary);
+  background: var(--bg);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   cursor: pointer;
   font-weight: var(--fw-semibold);
-  color: var(--text-primary);
+  color: var(--text);
   transition: all var(--transition-base);
   text-align: left;
 }
 
 .category-header:hover {
-  background: rgba(var(--primary-rgb), 0.1);
-  border-color: rgba(var(--primary-rgb), 0.2);
+  background: rgba(232, 149, 111, 0.1);
+  border-color: rgba(232, 149, 111, 0.2);
   color: var(--primary);
 }
 
@@ -286,7 +286,7 @@ const toggleCollapse = () => {
   flex-direction: column;
   gap: 2px;
   padding-left: var(--spacing-sm);
-  border-left: 2px solid rgba(var(--primary-rgb), 0.2);
+  border-left: 2px solid rgba(232, 149, 111, 0.2);
 }
 
 .module-link {
@@ -376,16 +376,16 @@ const toggleCollapse = () => {
   appearance: none;
   width: 36px;
   height: 18px;
-  background: var(--bg-secondary);
+  background: var(--bg);
   border-radius: 999px;
   position: relative;
   outline: none;
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--accent);
   cursor: pointer;
 }
 
 .module-toggle input[type='checkbox']:checked {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--success) 100%);
 }
 
 .module-toggle .toggle-knob {
@@ -410,8 +410,8 @@ const toggleCollapse = () => {
   gap: 8px;
   padding: 6px 8px;
   border-radius: 999px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-light);
+  background: var(--bg);
+  border: 1px solid var(--accent);
   cursor: pointer;
   font-size: 0.8rem;
   color: var(--text-secondary);
@@ -438,7 +438,7 @@ const toggleCollapse = () => {
 
 .quick-actions {
   padding: var(--spacing-md);
-  border-top: 1px solid var(--border-light);
+  border-top: 1px solid var(--accent);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
@@ -449,8 +449,8 @@ const toggleCollapse = () => {
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-light);
+  background: var(--bg);
+  border: 1px solid var(--accent);
   border-radius: var(--radius-md);
   cursor: pointer;
   color: var(--text-secondary);
@@ -459,8 +459,8 @@ const toggleCollapse = () => {
 }
 
 .action-btn:hover {
-  background: rgba(var(--primary-rgb), 0.1);
-  border-color: rgba(var(--primary-rgb), 0.2);
+  background: rgba(232, 149, 111, 0.1);
+  border-color: rgba(232, 149, 111, 0.2);
   color: var(--primary);
 }
 

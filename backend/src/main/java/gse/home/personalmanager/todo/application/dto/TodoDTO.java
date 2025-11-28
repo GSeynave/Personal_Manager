@@ -13,5 +13,6 @@ public class TodoDTO {
     private LocalDate due_date;
     private Boolean completed;
     private String assigned_to;
+    private Long todoGroupId;
 
 }
