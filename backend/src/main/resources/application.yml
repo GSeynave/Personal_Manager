@@ -5,6 +5,14 @@ spring:
     # Default dev profile
     profiles:
       active: ${SPRING_PROFILES_ACTIVE:dev}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics"
+  endpoint:
+    health:
+      show-details: always
 
 logging:
   level:
@@ -12,4 +20,3 @@ logging:
 
 firebase:
   project-id: personal-manager-gse
-

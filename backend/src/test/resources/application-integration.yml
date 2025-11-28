@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: personal-manager-integration
+
+  datasource:
+    url: jdbc:postgresql://localhost:5435/personal_manager_test?currentSchema=personal_manager
+    username: pm_test_user
+    password: pm_test_pwd
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: personal_manager
+
+logging:
+  level:
+    root: WARN
+    gse.home.personalmanager: DEBUG
