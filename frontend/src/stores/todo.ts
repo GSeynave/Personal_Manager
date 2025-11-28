@@ -116,11 +116,13 @@ export const useTodoStore = defineStore('todo', () => {
     if (index === -1) {
       // Search in groups
       for (let i = 0; i < groupedTodos.value.length; i++) {
-        todoIndexInGroup = groupedTodos.value[i].todos.findIndex(t => t.id === todo.id)
+        const group = groupedTodos.value[i]
+        if (!group) continue
+        todoIndexInGroup = group.todos.findIndex(t => t.id === todo.id)
         if (todoIndexInGroup !== -1) {
           groupIndex = i
-          currentGroupId = groupedTodos.value[i].id
-          previousTodo = groupedTodos.value[i].todos[todoIndexInGroup]
+          currentGroupId = group.id
+          previousTodo = group.todos[todoIndexInGroup]
           break
         }
       }
@@ -130,7 +132,10 @@ export const useTodoStore = defineStore('todo', () => {
     if (index !== -1) {
       ungroupedTodos.value[index] = { ...todo }
     } else if (groupIndex !== -1 && todoIndexInGroup !== -1) {
-      groupedTodos.value[groupIndex].todos[todoIndexInGroup] = { ...todo }
+      const group = groupedTodos.value[groupIndex]
+      if (group) {
+        group.todos[todoIndexInGroup] = { ...todo }
+      }
     }
     
     try {
@@ -144,7 +149,10 @@ export const useTodoStore = defineStore('todo', () => {
       if (index !== -1 && previousTodo) {
         ungroupedTodos.value[index] = previousTodo
       } else if (groupIndex !== -1 && todoIndexInGroup !== -1 && previousTodo) {
-        groupedTodos.value[groupIndex].todos[todoIndexInGroup] = previousTodo
+        const group = groupedTodos.value[groupIndex]
+        if (group) {
+          group.todos[todoIndexInGroup] = previousTodo
+        }
       }
       
       throw err
