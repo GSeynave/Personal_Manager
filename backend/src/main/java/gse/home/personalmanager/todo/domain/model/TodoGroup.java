@@ -38,4 +38,5 @@ public class TodoGroup {
 
     @OneToMany(mappedBy = "todoGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Todo> todos;
+
 }

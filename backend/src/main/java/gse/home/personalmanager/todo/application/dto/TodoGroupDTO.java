@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class TodoGroupDTO {
 
-    private int id;
+    private Long id;
     private String title;
     private String description;
     private List<TodoDTO> todos;
