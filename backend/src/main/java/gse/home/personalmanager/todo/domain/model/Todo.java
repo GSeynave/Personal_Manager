@@ -51,4 +51,10 @@ public class Todo {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private AppUser user;
+
+    public void updateDetails(boolean completed, TodoGroup todoGroup) {
+        this.completed = completed;
+        this.todoGroup = todoGroup;
+
+    }
 }

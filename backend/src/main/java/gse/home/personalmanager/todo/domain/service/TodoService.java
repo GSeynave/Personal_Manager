@@ -8,10 +8,10 @@ import gse.home.personalmanager.todo.application.mapper.TodoMapper;
 import gse.home.personalmanager.todo.domain.model.Todo;
 import gse.home.personalmanager.todo.domain.model.TodoGroup;
 import gse.home.personalmanager.todo.infrastructure.repository.TodoGroupRepository;
-import gse.home.personalmanager.user.domain.model.AppUserPrincipal;
+import gse.home.personalmanager.todo.infrastructure.repository.TodoRepository;
+import gse.home.personalmanager.user.domain.model.AppUser;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,8 +26,9 @@ public class TodoService {
     private final TodoMapper todoMapper;
     private final TodoGroupRepository todoGroupRepository;
     private final TodoGroupMapper todoGroupMapper;
+    private final TodoRepository todoRepository;
 
-    public TodosViewDTO getTodosView(List<Todo> todos) {
+    public TodosViewDTO getTodosView(List<Todo> todos, Long userId) {
         if (todos.isEmpty()) return new TodosViewDTO();
 
         TodosViewDTO viewDTO = new TodosViewDTO();
@@ -37,7 +38,6 @@ public class TodoService {
 
         // 2. Process grouped todos
         // Group the Todo objects by their TodoGroup ID
-        Long userId = ((AppUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser().getId();
         viewDTO.setGroupedTodos(getTodoGroupDTOS(todos, userId));
 
         return viewDTO;
@@ -75,5 +75,20 @@ public class TodoService {
                 .filter(t -> t.getTodoGroup() == null)
                 .map(todoMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    public Todo createTodoEntity(final TodoDTO dto, final AppUser user, final TodoGroup todoGroup) {
+        var entity = todoMapper.toEntity(dto);
+        entity.setUser(user);
+        entity.setTodoGroup(todoGroup);
+        return entity;
+    }
+
+    public Todo findEntityOrThrow(Long userId, Long id) {
+        return todoRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> {
+                    log.error("Todo with id: {} not found, cannot update", id);
+                    return new RuntimeException("Todo not found");
+                });
     }
 }

@@ -20,3 +20,6 @@ logging:
 
 firebase:
   project-id: personal-manager-gse
+
+server:
+  forward-headers-strategy: native

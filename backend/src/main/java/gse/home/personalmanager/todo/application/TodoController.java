@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -19,33 +18,34 @@ public class TodoController {
 
     TodoUseCaseService useCaseService;
 
-    @GetMapping
-    public ResponseEntity<TodosViewDTO> getTodos() {
-        AppUserPrincipal user = (AppUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        log.info("Request to get all todos for user: {}", user.getUser().getId());
-        log.info("Request to get all todos for user: {}", user.getUser().getEmail());
-        log.info("Request to get all todos for user: {}", user.getUser().getFirebaseUid());
+    private static Long getUserId(AppUserPrincipal userPrincipal) {
+        return userPrincipal.getUser().getId();
+    }
 
-        return ResponseEntity.ok(useCaseService.getAllTodos());
+    @GetMapping
+    public ResponseEntity<TodosViewDTO> getTodos(@AuthenticationPrincipal AppUserPrincipal userPrincipal) {
+        log.info("Request to get all todos for user: {}", getUserId(userPrincipal));
+        return ResponseEntity.ok(useCaseService.getAllTodos(getUserId(userPrincipal)));
     }
 
     @PostMapping
-    public ResponseEntity<Long> createTodo(@RequestBody TodoDTO todoDTO) {
-        log.info("Request to create a new todo");
-        return ResponseEntity.ok(useCaseService.createTodo(todoDTO));
+    public ResponseEntity<Long> createTodo(@AuthenticationPrincipal AppUserPrincipal userPrincipal, @RequestBody TodoDTO todoDTO) {
+        log.info("Request to create a new todo for user:{}", getUserId(userPrincipal));
+        return ResponseEntity.ok(useCaseService.createTodo(getUserId(userPrincipal), todoDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateTodo(@PathVariable Long id, @RequestBody TodoDTO todoDTO) {
-        log.info("Request to update a todo");
-        useCaseService.updateTodo(id, todoDTO);
+    public ResponseEntity<Void> updateTodo(@AuthenticationPrincipal AppUserPrincipal userPrincipal,
+                                           @PathVariable Long id, @RequestBody TodoDTO todoDTO) {
+        log.info("Request to update a todo for user: {}", getUserId(userPrincipal));
+        useCaseService.updateTodo(getUserId(userPrincipal), id, todoDTO);
         return ResponseEntity.ok(null);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> updateTodo(@AuthenticationPrincipal AppUserPrincipal userPrincipal, @PathVariable Long id) {
-        log.info("Request to delete a todo");
-        useCaseService.deleteTodo(userPrincipal.getUser().getId(), id);
+        log.info("Request to delete a todo for user: {}", getUserId(userPrincipal));
+        useCaseService.deleteTodo(getUserId(userPrincipal), id);
         return ResponseEntity.ok(null);
     }
 }
