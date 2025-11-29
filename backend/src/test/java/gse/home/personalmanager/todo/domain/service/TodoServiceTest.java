@@ -1,4 +1,4 @@
-package gse.home.personalmanager.unit.service;
+package gse.home.personalmanager.todo.domain.service;
 
 import gse.home.personalmanager.todo.application.dto.TodoDTO;
 import gse.home.personalmanager.todo.application.dto.TodoGroupDTO;
@@ -7,7 +7,6 @@ import gse.home.personalmanager.todo.application.mapper.TodoGroupMapper;
 import gse.home.personalmanager.todo.application.mapper.TodoMapper;
 import gse.home.personalmanager.todo.domain.model.Todo;
 import gse.home.personalmanager.todo.domain.model.TodoGroup;
-import gse.home.personalmanager.todo.domain.service.TodoService;
 import gse.home.personalmanager.todo.infrastructure.repository.TodoGroupRepository;
 import gse.home.personalmanager.unit.UnitTestBase;
 import gse.home.personalmanager.user.domain.model.AppUser;
