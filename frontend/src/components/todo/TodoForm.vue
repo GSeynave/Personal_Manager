@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { useTodoStore } from '@/stores/todo'
 import Todo from '@/model/Todo'
-import CardContent from '../Dashboard/CardContent.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const todoStore = useTodoStore()
@@ -39,7 +38,6 @@ async function createTodo() {
 </script>
 
 <template>
-  <CardContent :title="'Create Todo'">
     <form class="todo-form-container" @submit.prevent="createTodo">
       <div class="form-group">
         <label for="title">Title:</label>
@@ -62,16 +60,23 @@ async function createTodo() {
         {{ todoStore.isLoading ? 'Creating...' : 'Create Todo' }}
       </button>
     </form>
-  </CardContent>
 </template>
 
 <style scoped>
 .todo-form-container {
   display: flex;
   flex-direction: row;
-  gap: 1rem;
-  flex-wrap: wrap;
   align-items: flex-end;
+  padding-left: 1rem;
+  padding-bottom: 0.5rem;
+  gap: 1.5rem;
+  min-height: 80px;
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--bg-soft);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  margin-bottom: 1.5rem;
 }
 
 .form-group {
@@ -88,18 +93,19 @@ async function createTodo() {
 
 .form-group input {
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--accent);
+  border: 1px solid var(--border-color-hover);
   border-radius: 8px;
   background: var(--surface);
   color: var(--text);
   font-size: 1em;
   transition: all 0.2s;
   min-width: 200px;
+  box-shadow: 0 1px 3px var(--shadow-color);
 }
 
 .form-group select {
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--accent);
+  border: 1px solid var(--border-color-hover);
   border-radius: 8px;
   background: var(--surface);
   color: var(--text);
@@ -107,13 +113,14 @@ async function createTodo() {
   transition: all 0.2s;
   min-width: 200px;
   cursor: pointer;
+  box-shadow: 0 1px 3px var(--shadow-color);
 }
 
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(232, 149, 111, 0.1);
+  box-shadow: 0 0 0 3px var(--shadow-color);
 }
 
 .form-group input:hover,
@@ -131,12 +138,13 @@ async function createTodo() {
   font-weight: 600;
   transition: all 0.2s;
   font-size: 1em;
+  box-shadow: 0 2px 6px var(--shadow-color-hover);
 }
 
 .submit-button:hover:not(:disabled) {
   background: var(--accent);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(232, 149, 111, 0.3);
+  box-shadow: 0 4px 12px var(--shadow-color-hover);
 }
 
 .submit-button:disabled {

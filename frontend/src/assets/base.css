@@ -26,26 +26,42 @@
 [data-theme='light'] {
   --primary: #E8956F;
   --success: #7C9885;
-  --accent: #D4A574;
-  --bg: #FAF8F5;
+  --accent: #E89D6F;
+  --bg: #FFF4E6;
   --surface: #FFFFFF;
-  --text: #2D3436;
-  --text-secondary: #636E72;
+  --text: #5D4E37;
+  --text-secondary: #8B7355;
   --gentle-alert: #E89D6F;
   --reflection: #9B8FB0;
+  
+  /* Additional peachy tones */
+  --bg-soft: #FFF9F0;
+  --accent-light: #FFECD9;
+  --border-color: rgba(232, 149, 111, 0.2);
+  --border-color-hover: rgba(232, 149, 111, 0.4);
+  --shadow-color: rgba(212, 165, 116, 0.15);
+  --shadow-color-hover: rgba(232, 149, 111, 0.25);
 }
 
 /* Universal color palette - Dark Theme */
 [data-theme='dark'] {
   --primary: #E8956F;
   --success: #8FAA97;
-  --accent: #C9A568;
-  --bg: #1A1612;
-  --surface: #2A2520;
-  --text: #E8E6E3;
-  --text-secondary: #B8B5B0;
+  --accent: #E89D6F;
+  --bg: #2A2520;
+  --surface: #3A3530;
+  --text: #F5EFE6;
+  --text-secondary: #C9C0B5;
   --gentle-alert: #E89D6F;
   --reflection: #A89FC0;
+  
+  /* Additional peachy tones for dark mode */
+  --bg-soft: #1F1B17;
+  --accent-light: #4A3F35;
+  --border-color: rgba(232, 149, 111, 0.3);
+  --border-color-hover: rgba(232, 149, 111, 0.5);
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --shadow-color-hover: rgba(232, 149, 111, 0.2);
 }
 
 /* semantic color variables for this project */

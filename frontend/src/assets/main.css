@@ -1,6 +1,266 @@
 @import './base.css';
 @import 'primeicons/primeicons.css';
 
+/* Natural Growth theme (default) - Warm earthy tones */
+:root,
+[data-theme="natural"] {
+  /* Warm creamy base with terracotta primary and subtle matte green accents */
+  --background: oklch(0.94 0.012 60); /* Creamy warm background, not white */
+  --foreground: oklch(0.28 0.015 40); /* Warm dark brown */
+  --card: oklch(0.97 0.008 55); /* Slightly lighter cream for cards */
+  --card-foreground: oklch(0.3 0.015 40);
+  --popover: oklch(0.97 0.008 55);
+  --popover-foreground: oklch(0.28 0.015 40);
+  --primary: oklch(0.58 0.12 35); /* Terracotta - warm clay orange-red */
+  --primary-foreground: oklch(0.98 0.006 55);
+  --secondary: oklch(0.88 0.015 60); /* Warm beige/sand */
+  --secondary-foreground: oklch(0.3 0.015 40);
+  --muted: oklch(0.91 0.012 58); /* Warm light gray-cream */
+  --muted-foreground: oklch(0.52 0.02 50);
+  --accent: oklch(0.65 0.06 150); /* Subtle matte green for accents */
+  --accent-foreground: oklch(0.98 0.006 55);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.99 0.01 55);
+  --border: oklch(0.87 0.015 58); /* Warm cream border */
+  --input: oklch(0.92 0.012 58);
+  --ring: oklch(0.58 0.12 35);
+  --chart-1: oklch(0.58 0.12 35);
+  --chart-2: oklch(0.65 0.06 150);
+  --chart-3: oklch(0.62 0.08 50);
+  --chart-4: oklch(0.55 0.05 70);
+  --chart-5: oklch(0.68 0.07 140);
+  --radius: 1rem;
+  --sidebar: oklch(0.96 0.01 58);
+  --sidebar-foreground: oklch(0.28 0.015 40);
+  --sidebar-primary: oklch(0.3 0.015 40);
+  --sidebar-primary-foreground: oklch(0.96 0.01 58);
+  --sidebar-accent: oklch(0.92 0.015 150);
+  --sidebar-accent-foreground: oklch(0.3 0.015 40);
+  --sidebar-border: oklch(0.89 0.012 58);
+  --sidebar-ring: oklch(0.7 0.01 50);
+  
+  /* Legacy compatibility variables */
+  --bg: #FFF4E6;
+  --bg-soft: #FFF9F0;
+  --surface: #FFFFFF;
+  --text: #5D4E37;
+  --text-secondary: #8B7355;
+  --accent-light: #FFECD9;
+  --border-color: rgba(232, 149, 111, 0.2);
+  --border-color-hover: rgba(232, 149, 111, 0.4);
+  --shadow-color: rgba(212, 165, 116, 0.15);
+  --shadow-color-hover: rgba(232, 149, 111, 0.25);
+  --success: #7C9885;
+  --gentle-alert: #E89D6F;
+  --reflection: #9B8FB0;
+}
+
+/* Cosmic Growth theme - Deep space with purple/blue galaxy tones */
+[data-theme="cosmic"] {
+  --background: oklch(0.18 0.04 280); /* Deep space purple-blue */
+  --foreground: oklch(0.92 0.02 280); /* Light cosmic white */
+  --card: oklch(0.22 0.05 285); /* Slightly lighter space card */
+  --card-foreground: oklch(0.92 0.02 280);
+  --popover: oklch(0.22 0.05 285);
+  --popover-foreground: oklch(0.92 0.02 280);
+  --primary: oklch(0.68 0.18 290); /* Vibrant cosmic purple */
+  --primary-foreground: oklch(0.98 0.01 280);
+  --secondary: oklch(0.55 0.12 250); /* Deep nebula blue */
+  --secondary-foreground: oklch(0.98 0.01 280);
+  --muted: oklch(0.28 0.04 285); /* Muted space gray */
+  --muted-foreground: oklch(0.65 0.03 280);
+  --accent: oklch(0.72 0.16 320); /* Bright magenta accent */
+  --accent-foreground: oklch(0.98 0.01 280);
+  --destructive: oklch(0.55 0.22 15);
+  --destructive-foreground: oklch(0.98 0.01 280);
+  --border: oklch(0.32 0.05 285);
+  --input: oklch(0.26 0.04 285);
+  --ring: oklch(0.68 0.18 290);
+  --chart-1: oklch(0.68 0.18 290);
+  --chart-2: oklch(0.72 0.16 320);
+  --chart-3: oklch(0.65 0.14 200);
+  --chart-4: oklch(0.6 0.12 310);
+  --chart-5: oklch(0.7 0.15 260);
+  --radius: 1rem;
+  --sidebar: oklch(0.2 0.045 282);
+  --sidebar-foreground: oklch(0.92 0.02 280);
+  --sidebar-primary: oklch(0.68 0.18 290);
+  --sidebar-primary-foreground: oklch(0.98 0.01 280);
+  --sidebar-accent: oklch(0.3 0.06 290);
+  --sidebar-accent-foreground: oklch(0.92 0.02 280);
+  --sidebar-border: oklch(0.3 0.05 285);
+  --sidebar-ring: oklch(0.5 0.08 285);
+  
+  /* Legacy compatibility variables */
+  --bg: #2A2035;
+  --bg-soft: #1F1B27;
+  --surface: #352F42;
+  --text: #E8E3F0;
+  --text-secondary: #B8B0C8;
+  --accent-light: #4A3F5A;
+  --border-color: rgba(168, 120, 200, 0.3);
+  --border-color-hover: rgba(168, 120, 200, 0.5);
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --shadow-color-hover: rgba(168, 120, 200, 0.25);
+  --success: #8FAA97;
+  --gentle-alert: #B880C8;
+  --reflection: #C8A0E0;
+}
+
+/* Zen Space theme - Ultra minimal cool grays with soft blue accents */
+[data-theme="zen"] {
+  --background: oklch(0.96 0.003 220); /* Very light cool gray, almost white */
+  --foreground: oklch(0.25 0.01 220); /* Deep cool charcoal */
+  --card: oklch(0.98 0.002 220); /* Nearly white cards */
+  --card-foreground: oklch(0.25 0.01 220);
+  --popover: oklch(0.98 0.002 220);
+  --popover-foreground: oklch(0.25 0.01 220);
+  --primary: oklch(0.5 0.08 230); /* Calm slate blue */
+  --primary-foreground: oklch(0.98 0.002 220);
+  --secondary: oklch(0.85 0.01 220); /* Soft cool gray */
+  --secondary-foreground: oklch(0.25 0.01 220);
+  --muted: oklch(0.92 0.005 220); /* Very pale gray */
+  --muted-foreground: oklch(0.55 0.02 220);
+  --accent: oklch(0.6 0.06 200); /* Gentle cyan-blue accent */
+  --accent-foreground: oklch(0.98 0.002 220);
+  --destructive: oklch(0.55 0.15 25);
+  --destructive-foreground: oklch(0.98 0.002 220);
+  --border: oklch(0.88 0.005 220);
+  --input: oklch(0.94 0.003 220);
+  --ring: oklch(0.5 0.08 230);
+  --chart-1: oklch(0.5 0.08 230);
+  --chart-2: oklch(0.6 0.06 200);
+  --chart-3: oklch(0.55 0.07 210);
+  --chart-4: oklch(0.52 0.05 240);
+  --chart-5: oklch(0.58 0.06 190);
+  --radius: 0.5rem;
+  --sidebar: oklch(0.97 0.002 220);
+  --sidebar-foreground: oklch(0.25 0.01 220);
+  --sidebar-primary: oklch(0.5 0.08 230);
+  --sidebar-primary-foreground: oklch(0.98 0.002 220);
+  --sidebar-accent: oklch(0.93 0.004 220);
+  --sidebar-accent-foreground: oklch(0.25 0.01 220);
+  --sidebar-border: oklch(0.9 0.004 220);
+  --sidebar-ring: oklch(0.6 0.05 220);
+  
+  /* Legacy compatibility variables */
+  --bg: #F5F5F6;
+  --bg-soft: #FAFAFA;
+  --surface: #FFFFFF;
+  --text: #404045;
+  --text-secondary: #70707A;
+  --accent-light: #E8E8EA;
+  --border-color: rgba(100, 110, 120, 0.15);
+  --border-color-hover: rgba(100, 110, 120, 0.3);
+  --shadow-color: rgba(0, 0, 0, 0.05);
+  --shadow-color-hover: rgba(100, 110, 120, 0.15);
+  --success: #7C9885;
+  --gentle-alert: #8090A0;
+  --reflection: #90A0B0;
+}
+
+.dark,
+[data-theme="dark"] {
+  --background: oklch(0.18 0.012 70);
+  --foreground: oklch(0.94 0.008 80);
+  --card: oklch(0.22 0.012 70);
+  --card-foreground: oklch(0.94 0.008 80);
+  --popover: oklch(0.22 0.012 70);
+  --popover-foreground: oklch(0.94 0.008 80);
+  --primary: oklch(0.65 0.09 155);
+  --primary-foreground: oklch(0.18 0.012 70);
+  --secondary: oklch(0.7 0.07 75);
+  --secondary-foreground: oklch(0.18 0.012 70);
+  --muted: oklch(0.26 0.012 70);
+  --muted-foreground: oklch(0.62 0.02 75);
+  --accent: oklch(0.3 0.015 150);
+  --accent-foreground: oklch(0.94 0.008 80);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.94 0.008 80);
+  --border: oklch(0.3 0.012 70);
+  --input: oklch(0.28 0.012 70);
+  --ring: oklch(0.65 0.09 155);
+  --chart-1: oklch(0.65 0.09 155);
+  --chart-2: oklch(0.7 0.07 75);
+  --chart-3: oklch(0.68 0.08 140);
+  --chart-4: oklch(0.62 0.06 60);
+  --chart-5: oklch(0.72 0.08 165);
+  --sidebar: oklch(0.22 0.012 70);
+  --sidebar-foreground: oklch(0.94 0.008 80);
+  --sidebar-primary: oklch(0.65 0.09 155);
+  --sidebar-primary-foreground: oklch(0.94 0.008 80);
+  --sidebar-accent: oklch(0.3 0.015 150);
+  --sidebar-accent-foreground: oklch(0.94 0.008 80);
+  --sidebar-border: oklch(0.3 0.012 70);
+  --sidebar-ring: oklch(0.5 0.02 75);
+  
+  /* Legacy compatibility variables */
+  --bg: #2A2520;
+  --bg-soft: #1F1B17;
+  --surface: #3A3530;
+  --text: #F5EFE6;
+  --text-secondary: #C9C0B5;
+  --accent-light: #4A3F35;
+  --border-color: rgba(232, 149, 111, 0.3);
+  --border-color-hover: rgba(232, 149, 111, 0.5);
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --shadow-color-hover: rgba(232, 149, 111, 0.2);
+  --success: #8FAA97;
+  --gentle-alert: #E89D6F;
+  --reflection: #A89FC0;
+}
+
+/* Custom animations for spiritual growth moments */
+@keyframes bloom {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px oklch(0.58 0.14 155 / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px oklch(0.58 0.14 155 / 0.6);
+  }
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-50px) scale(0);
+    opacity: 0;
+  }
+}
+
+.bloom-animation {
+  animation: bloom 0.6s ease-out;
+}
+
+.glow-animation {
+  animation: glow 2s ease-in-out infinite;
+}
+
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
 #app {
   max-width: none;
   margin: 0 auto;
