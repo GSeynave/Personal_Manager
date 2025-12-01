@@ -153,23 +153,28 @@ function getAssigneeImage(name: string | null) {
 
 <style scoped>
 .todo-item.completed {
-  background-color: var(--success);
+  background-color: rgba(124, 152, 133, 0.15);
   opacity: 0.7;
   text-decoration: line-through;
   color: var(--text-secondary);
 }
+
 .todo-item {
-  padding: 0.5rem;
-  padding-right: 1.5rem;
-  border: 1px solid var(--accent);
-  border-radius: 8px;
-  margin: 0.5rem 0;
+  padding: 0.75rem 1rem;
+  padding-right: 2rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
   position: relative;
   overflow: visible;
   cursor: grab;
   background: var(--surface);
   color: var(--text);
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 1px 3px var(--shadow-color);
 }
 
 .todo-item.is-dragging-self {
@@ -181,45 +186,54 @@ function getAssigneeImage(name: string | null) {
 .todo-item:active {
   cursor: grabbing;
 }
+
 .todo-item:hover {
-  box-shadow: 0 2px 8px rgba(212, 165, 116, 0.2);
+  box-shadow: 0 3px 10px var(--shadow-color-hover);
   border-color: var(--primary);
+  transform: translateY(-2px);
 }
+
 .completion-icon {
   cursor: pointer;
   margin-right: 0.5rem;
+  flex-shrink: 0;
 }
+
 .delete-icon {
   position: absolute;
   top: 4px;
   right: 4px;
   cursor: pointer;
   z-index: 10;
-  background: var(--surface);
+  background: var(--bg);
   border-radius: 50%;
   width: 24px;
   height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 2px var(--shadow-color);
   transition: all 0.2s;
+  color: var(--accent);
 }
+
 .delete-icon:hover {
   background: var(--gentle-alert);
+  color: var(--surface);
   transform: scale(1.1);
 }
+
 .todo-title {
   font-weight: 600;
   color: var(--text);
+  flex: 1;
 }
+
 .todo-details {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .assignee-images {
@@ -229,16 +243,17 @@ function getAssigneeImage(name: string | null) {
 }
 
 .due-date {
-  text-align: right;
-  font-size: 0.8em;
+  font-size: 0.85em;
   color: var(--text-secondary);
+  white-space: nowrap;
 }
+
 .assignee-img {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   vertical-align: middle;
   cursor: pointer;
-  border: 2px solid var(--accent);
+  border: 2px solid var(--accent-light);
 }
 </style>

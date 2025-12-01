@@ -1,16 +1,40 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
 import { useAuthStore } from '@/stores/auth'
+import ThemeSwitcher from './ThemeSwitcher.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const isUserMenuOpen = ref(false)
+const showThemeSwitcher = ref(false)
+const themeToggleRef = ref<HTMLElement | null>(null)
 
 const toggleUserMenu = () => {
   isUserMenuOpen.value = !isUserMenuOpen.value
 }
+
+const toggleThemeSwitcher = () => {
+  showThemeSwitcher.value = !showThemeSwitcher.value
+}
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (themeToggleRef.value && !themeToggleRef.value.contains(event.target as Node)) {
+    showThemeSwitcher.value = false
+  }
+  if (isUserMenuOpen.value && !(event.target as HTMLElement).closest('.user-menu-wrapper')) {
+    isUserMenuOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 
 const handleLogout = async () => {
   await authStore.logout()
@@ -34,7 +58,13 @@ const displayName = computed(() => {
 
 // theme
 const themeStore = useThemeStore()
-const toggleTheme = () => themeStore.toggle()
+
+const themeIcons = {
+  natural: '🌿',
+  cosmic: '🌌',
+  zen: '☯️',
+  dark: '🌙'
+}
 </script>
 
 <template>
@@ -48,14 +78,18 @@ const toggleTheme = () => themeStore.toggle()
 
       <!-- Right Section: User Menu -->
       <div class="navbar-right">
-        <button
-          class="theme-toggle btn-ghost"
-          @click="toggleTheme"
-          :title="themeStore.theme === 'light' ? 'Switch to dark' : 'Switch to light'"
-        >
-          <span v-if="themeStore.theme === 'light'">🌙</span>
-          <span v-else>☀️</span>
-        </button>
+        <div ref="themeToggleRef" class="theme-toggle-wrapper">
+          <button
+            class="theme-toggle btn-ghost"
+            @click="toggleThemeSwitcher"
+            :title="'Change theme'"
+          >
+            <span>{{ themeIcons[themeStore.theme] }}</span>
+          </button>
+          <div v-if="showThemeSwitcher" class="theme-dropdown">
+            <ThemeSwitcher />
+          </div>
+        </div>
         <div class="user-section">
           <button v-if="!authStore.isAuthenticated" class="btn-login" @click="handleLogin">Login</button>
           <div v-else class="user-menu-wrapper">
@@ -136,6 +170,48 @@ const toggleTheme = () => themeStore.toggle()
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
+}
+
+.theme-toggle-wrapper {
+  position: relative;
+}
+
+.theme-toggle {
+  padding: var(--spacing-sm);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-tertiary);
+  transform: translateY(-2px);
+}
+
+.theme-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: var(--spacing-sm);
+  z-index: 100;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .user-section {

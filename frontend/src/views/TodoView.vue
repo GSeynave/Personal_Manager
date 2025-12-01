@@ -24,20 +24,8 @@ import TodoForm from '../components/todo/TodoForm.vue'
 <style scoped>
 main {
   padding: var(--spacing-lg, 24px);
-  position: relative;
   background: var(--bg);
   min-height: 100vh;
-}
-
-main::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 6px;
-  background: var(--primary);
-  border-radius: 4px 0 0 4px;
 }
 
 .page-header {
@@ -49,7 +37,7 @@ main::before {
   margin: 0 0 6px 0;
   font-size: 2rem;
   font-weight: 700;
-  color: var(--module-color, #6a1b9a);
+  color: var(--primary, #6a1b9a);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -58,6 +46,6 @@ main::before {
 .page-subtitle {
   margin: 0;
   font-size: 0.95rem;
-  color: var(--text-secondary);
+  color: var(--secondary);
 }
 </style>
