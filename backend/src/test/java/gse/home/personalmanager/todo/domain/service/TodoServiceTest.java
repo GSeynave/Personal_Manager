@@ -1,4 +1,4 @@
-package gse.home.personalmanager.unit.service;
+package gse.home.personalmanager.todo.domain.service;
 
 import gse.home.personalmanager.todo.application.dto.TodoDTO;
 import gse.home.personalmanager.todo.application.dto.TodoGroupDTO;
@@ -7,7 +7,6 @@ import gse.home.personalmanager.todo.application.mapper.TodoGroupMapper;
 import gse.home.personalmanager.todo.application.mapper.TodoMapper;
 import gse.home.personalmanager.todo.domain.model.Todo;
 import gse.home.personalmanager.todo.domain.model.TodoGroup;
-import gse.home.personalmanager.todo.domain.service.TodoService;
 import gse.home.personalmanager.todo.infrastructure.repository.TodoGroupRepository;
 import gse.home.personalmanager.unit.UnitTestBase;
 import gse.home.personalmanager.user.domain.model.AppUser;
@@ -68,7 +67,7 @@ public class TodoServiceTest extends UnitTestBase {
 
     @Test
     void getTodosView_shouldReturnEmptyView_whenInputListIsEmpty() {
-        TodosViewDTO result = todoService.getTodosView(Collections.emptyList());
+        TodosViewDTO result = todoService.getTodosView(Collections.emptyList(), 1L);
 
         assertThat(result).isNotNull();
         assertThat(result.getUngroupedTodos()).isNull();
@@ -113,7 +112,7 @@ public class TodoServiceTest extends UnitTestBase {
         when(todoGroupRepository.findAllByUserId(1L)).thenReturn(Collections.singletonList(group1));
 
         // Act
-        TodosViewDTO result = todoService.getTodosView(todos);
+        TodosViewDTO result = todoService.getTodosView(todos, 1L);
 
         // Assert
         assertThat(result).isNotNull();
@@ -161,7 +160,7 @@ public class TodoServiceTest extends UnitTestBase {
         when(todoGroupRepository.findAllByUserId(1L)).thenReturn(Arrays.asList(group1, group2));
 
         // Act
-        TodosViewDTO result = todoService.getTodosView(todos);
+        TodosViewDTO result = todoService.getTodosView(todos, 1L);
 
         // Assert
         assertThat(result.getUngroupedTodos()).isEmpty();
