@@ -1,65 +1,82 @@
 <script setup lang="ts">
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
 import { ref } from 'vue'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { ChevronDown, ChevronRight } from 'lucide-vue-next'
 import CardContent from '../Dashboard/CardContent.vue'
 
 const props = defineProps(['transactionSummary'])
-const expandedRows = ref({})
+const expandedCategories = ref<Set<string>>(new Set())
+
+function toggleCategory(category: string) {
+  if (expandedCategories.value.has(category)) {
+    expandedCategories.value.delete(category)
+  } else {
+    expandedCategories.value.add(category)
+  }
+}
+
+function isExpanded(category: string) {
+  return expandedCategories.value.has(category)
+}
 </script>
 
 <template>
   <CardContent :title="'Transactions'">
-    <div class="table-wrapper">
-      <DataTable
-        class="accent-table"
-        :value="props.transactionSummary"
-        v-model:expandedRows="expandedRows"
-        dataKey="category"
-        rowExpansionTemplate
-      >
-        <Column expander style="width: 3em"></Column>
-        <Column field="category" header="Category"></Column>
-        <Column field="expense" header="Expense"></Column>
-        <!-- add a percent symbol -->
-
-        <Column field="percent" header="Percent"></Column>
-        <Column field="maxExpected" header="Max Expected"></Column>
-        <!-- Make a column that is expandable on the transactions value, and group them by transaction.customCategory -->
-        <template #expansion="slotProps">
-          <DataTable :value="slotProps.data.transactions">
-            <Column field="customCategory" header="Description"></Column>
-            <Column field="amount" header="Amount"></Column>
-            <Column field="date" header="Date"></Column>
-          </DataTable>
-        </template>
-      </DataTable>
+    <div class="table-wrapper border rounded-md">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead class="w-12"></TableHead>
+            <TableHead>Category</TableHead>
+            <TableHead>Expense</TableHead>
+            <TableHead>Percent</TableHead>
+            <TableHead>Max Expected</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <template v-for="summary in props.transactionSummary" :key="summary.category">
+            <TableRow class="cursor-pointer hover:bg-accent/50" @click="toggleCategory(summary.category)">
+              <TableCell>
+                <Button variant="ghost" size="icon" class="h-6 w-6">
+                  <ChevronDown v-if="isExpanded(summary.category)" class="h-4 w-4" />
+                  <ChevronRight v-else class="h-4 w-4" />
+                </Button>
+              </TableCell>
+              <TableCell class="font-medium">{{ summary.category }}</TableCell>
+              <TableCell>{{ summary.expense }}</TableCell>
+              <TableCell>{{ summary.percent }}</TableCell>
+              <TableCell>{{ summary.maxExpected }}</TableCell>
+            </TableRow>
+            <TableRow v-if="isExpanded(summary.category)" class="bg-muted/50">
+              <TableCell colspan="5" class="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead class="pl-16">Description</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow v-for="(transaction, idx) in summary.transactions" :key="idx" class="bg-muted/30">
+                      <TableCell class="pl-16">{{ transaction.customCategory }}</TableCell>
+                      <TableCell>{{ transaction.amount }}</TableCell>
+                      <TableCell>{{ transaction.date }}</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableCell>
+            </TableRow>
+          </template>
+        </TableBody>
+      </Table>
     </div>
   </CardContent>
 </template>
+
 <style scoped>
 .table-wrapper {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-}
-
-/* PrimeVue table header tint and accent */
-:deep(.accent-table .p-datatable-thead > tr > th) {
-  background: linear-gradient(
-    90deg,
-    rgba(var(--module-color-rgb, 46, 125, 50), 0.08),
-    rgba(var(--module-color-rgb, 46, 125, 50), 0.03)
-  );
-  color: var(--module-color, #2e7d32);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-:deep(.accent-table .p-datatable) {
-  background: var(--card-bg, rgba(255, 255, 255, 0.02));
-}
-
-:deep(.accent-table .p-datatable-tbody > tr > td) {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 </style>

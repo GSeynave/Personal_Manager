@@ -49,6 +49,12 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
     },
     {
+      path: '/habits',
+      name: 'habits',
+      component: () => import('../views/HabitsView.vue'),
+      meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
+    },
+    {
       path: '/about',
       name: 'about',
       component: () => import('../views/AboutView.vue'),

@@ -180,6 +180,7 @@ const routeMap: Record<string, string | undefined> = {
   calendar: '/calendar',
   diet: '/diet',
   sleep: '/sleep',
+  habits: '/habit',
 }
 
 // Module colors are centralized in src/config/moduleColors.ts and imported above
