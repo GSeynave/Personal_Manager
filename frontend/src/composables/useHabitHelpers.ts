@@ -80,13 +80,21 @@ export function useHabitHelpers(
     return todayLog?.[field]
   }
 
+  // Helper function to format date consistently without timezone conversion
+  function formatDateToString(date: Date): string {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
   // Get status for a specific date
   function getDateStatus(habitId: number, date: Date): 'complete' | 'partial' | 'unlogged' {
     const habit = habits.value.find(h => h.id === habitId)
     if (!habit) return 'unlogged'
     
     const logs = habitLogs.value.get(habitId)
-    const dateStr = date.toISOString().split('T')[0]
+    const dateStr = formatDateToString(date)
     
     if (!logs || logs.length === 0) return 'unlogged'
     

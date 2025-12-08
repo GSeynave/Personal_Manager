@@ -2,7 +2,6 @@
 import { RouterView, useRoute, RouterLink } from 'vue-router'
 import { computed, onMounted, onUnmounted, watch, ref } from 'vue'
 import { Bell } from 'lucide-vue-next'
-import TopNavbar from './components/TopNavbar.vue'
 import AppSidebar from './components/AppSidebar.vue'
 import ToastNotification from './components/ToastNotification.vue'
 import CircularProgress from './components/CircularProgress.vue'

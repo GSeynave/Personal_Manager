@@ -25,39 +25,10 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
     },
     {
-      path: '/diet',
-      name: 'diet',
-      component: () => import('../views/DietView.vue'),
-      meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
-    },
-    {
-      path: '/energy',
-      name: 'energy',
-      component: () => import('../views/EnergyView.vue'),
-      meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
-    },
-    {
-      path: '/calendar',
-      name: 'calendar',
-      component: () => import('../views/CalendarView.vue'),
-      meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
-    },
-    {
-      path: '/sleep',
-      name: 'sleep',
-      component: () => import('../views/SleepView.vue'),
-      meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
-    },
-    {
       path: '/habits',
       name: 'habits',
       component: () => import('../views/HabitsView.vue'),
       meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
-    },
-    {
-      path: '/about',
-      name: 'about',
-      component: () => import('../views/AboutView.vue'),
     },
     {
       path: '/login',

@@ -2,27 +2,10 @@
 import { ref, reactive, type Component, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import TodoService from '@/services/TodoService'
-import AccountingService from '@/services/AccountingService'
 import { moduleColor } from '@/config/moduleColors'
-// Wellness & Health
+// Implemented modules only
 import TodoCard from './TodoCard.vue'
-import DietCard from './DietCard.vue'
-import SleepCard from './SleepCard.vue'
-import FitnessCard from './FitnessCard.vue'
-import HealthCard from './HealthCard.vue'
 import HabitsCard from './HabitsCard.vue'
-// Productivity & Work
-import ProjectsCard from './ProjectsCard.vue'
-import PomodoroCard from './PomodoroCard.vue'
-import CalendarCard from './CalendarCard.vue'
-import NotesCard from './NotesCard.vue'
-// Personal Development
-import GoalsCard from './GoalsCard.vue'
-import LearningCard from './LearningCard.vue'
-// Life Management
-import FinanceCard from './FinanceCard.vue'
-import EnergyCard from './EnergyCard.vue'
-import POICard from './POICard.vue'
 
 type Widget = {
   id: string
@@ -33,11 +16,8 @@ type Widget = {
   props?: Record<string, unknown>
 }
 
-// Default widget order for the Bento layout. This is reactive so reordering persists in-memory.
-// NOTE: these include example `props`/`data` objects so the compact previews are dynamic.
-// Replace these sample objects with real data fetched from services or stores (Pinia) as needed.
+// Dashboard widgets for implemented modules only
 const widgets = reactive<Widget[]>([
-  // Wellness & Health (row 1)
   {
     id: 'w-todo',
     key: 'todo',
@@ -47,122 +27,12 @@ const widgets = reactive<Widget[]>([
     props: { data: { title: 'Buy milk', priority: 'high', daysUntilDue: 1, isOverdue: false } },
   },
   {
-    id: 'w-diet',
-    key: 'diet',
-    label: 'Diet',
-    component: DietCard,
-    dataPeak: '1200 / 2000 kcal',
-    props: { data: { consumed: '1200', allowed: '2000' } },
-  },
-  {
-    id: 'w-sleep',
-    key: 'sleep',
-    label: 'Sleep',
-    component: SleepCard,
-    dataPeak: '7h - Fair',
-    props: { data: { lastNightHours: 7, quality: 'fair', goalHours: 8 } },
-  },
-  // Wellness & Health (row 2)
-  {
-    id: 'w-fitness',
-    key: 'fitness',
-    label: 'Fitness',
-    component: FitnessCard,
-    dataPeak: '250 / 500 kcal',
-    props: { data: { workoutTime: 20, caloriesBurned: 250, goal: 500 } },
-  },
-  {
-    id: 'w-health',
-    key: 'health',
-    label: 'Health',
-    component: HealthCard,
-    dataPeak: '✓ All clear',
-    props: { data: { appointments: 1, medications: 2, symptoms: false } },
-  },
-  {
     id: 'w-habits',
     key: 'habits',
     label: 'Habits',
     component: HabitsCard,
     dataPeak: '🔥 5d streak',
     props: { data: { currentStreak: 5, bestStreak: 12, completedToday: true } },
-  },
-  // Productivity & Work (row 3)
-  {
-    id: 'w-projects',
-    key: 'projects',
-    label: 'Projects',
-    component: ProjectsCard,
-    dataPeak: '2 active, 1 due',
-    props: { data: { activeProjects: 2, tasksDue: 1, teamMembers: 3 } },
-  },
-  {
-    id: 'w-pomodoro',
-    key: 'pomodoro',
-    label: 'Pomodoro',
-    component: PomodoroCard,
-    dataPeak: '45min • 2/4',
-    props: { data: { sessionsToday: 2, focusTime: 45, targetSessions: 4 } },
-  },
-  {
-    id: 'w-calendar',
-    key: 'calendar',
-    label: 'Calendar',
-    component: CalendarCard,
-    dataPeak: '3 events',
-    props: { data: { nextEvent: 'Team meeting', eventsToday: 3, timeUntil: '2h' } },
-  },
-  // Productivity & Work (row 4)
-  {
-    id: 'w-notes',
-    key: 'notes',
-    label: 'Notes',
-    component: NotesCard,
-    dataPeak: '42 notes',
-    props: { data: { notesCount: 42, lastNote: 'Bento dashboard design', todayNotes: 3 } },
-  },
-  {
-    id: 'w-goals',
-    key: 'goals',
-    label: 'Goals',
-    component: GoalsCard,
-    dataPeak: '3 active, 45%',
-    props: { data: { activeGoals: 3, completedGoals: 2, progressPercent: 45 } },
-  },
-  {
-    id: 'w-learning',
-    key: 'learning',
-    label: 'Learning',
-    component: LearningCard,
-    dataPeak: '2 courses',
-    props: {
-      data: { activeCourses: 2, skillsLearning: 3, currentRead: 'The Pragmatic Programmer' },
-    },
-  },
-  // Life Management (row 5)
-  {
-    id: 'w-fin',
-    key: 'finance',
-    label: 'Finance',
-    component: FinanceCard,
-    dataPeak: 'Revenue €3,200',
-    props: { data: { revenue: '€3,200', leftover: '€1,150' } },
-  },
-  {
-    id: 'w-energy',
-    key: 'energy',
-    label: 'Energy',
-    component: EnergyCard,
-    dataPeak: 'Gas +8% / Electricity -3%',
-    props: { data: { gasYoYPercent: 8, electricityYoYPercent: -3 } },
-  },
-  {
-    id: 'w-poi',
-    key: 'poi',
-    label: 'Places',
-    component: POICard,
-    dataPeak: '12 POI, 2 nearby',
-    props: { data: { poiCount: 12, nearbyCount: 2, lastVisited: 'Coffee shop' } },
   },
 ])
 
@@ -174,13 +44,8 @@ const router = useRouter()
 
 // map widget keys to routes (clicking a card navigates to its view)
 const routeMap: Record<string, string | undefined> = {
-  finance: '/accounting',
-  energy: '/energy',
   todo: '/todo',
-  calendar: '/calendar',
-  diet: '/diet',
-  sleep: '/sleep',
-  habits: '/habit',
+  habits: '/habits',
 }
 
 // Module colors are centralized in src/config/moduleColors.ts and imported above
@@ -247,7 +112,6 @@ function headerPeak(w: Widget) {
 
 // Services (simple, can be replaced by Pinia stores or composables)
 const todoService = new TodoService()
-const accountingService = new AccountingService()
 
 // Fetch small previews (data peaks) from backend services and populate widget props.
 onMounted(async () => {
@@ -289,87 +153,7 @@ onMounted(async () => {
       }
     }
 
-    // Accounting: get a small summary (income/expense/saving) for the current month
-    const formatDate = (d: Date) =>
-      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
-        d.getDate(),
-      ).padStart(2, '0')}`
-    const now = new Date()
-    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const lastOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-    const summaryParams = new URLSearchParams({
-      minDate: formatDate(firstOfMonth),
-      maxDate: formatDate(lastOfMonth),
-    })
-    const summary = await accountingService.getAccountingSummary(summaryParams)
-    const revenue = summary?.income ? `€${summary.income.toLocaleString()}` : '€0'
-    const leftover = summary?.saving
-      ? `€${summary.saving.toLocaleString()}`
-      : summary && summary.income && summary.expense
-        ? `€${(summary.income - summary.expense).toLocaleString()}`
-        : '€0'
-    const finWidget = widgets.find((w) => w.key === 'finance')
-    if (finWidget) {
-      finWidget.props = { ...finWidget.props, data: { revenue, leftover } }
-      finWidget.dataPeak = `Revenue ${revenue}`
-    }
-
-    // Energy: mock YoY comparison data (replace with real API call later)
-    const energyWidget = widgets.find((w) => w.key === 'energy')
-    if (energyWidget) {
-      // Mock data: Gas +8% (worse), Electricity -3% (better)
-      // TODO: Replace with real API call to get YoY comparison
-      energyWidget.props = {
-        ...energyWidget.props,
-        data: { gasYoYPercent: 8, electricityYoYPercent: -3 },
-      }
-    }
-
-    // Finance: try to build a small 6-month series (income - expense) for a sparkline.
-    // This attempts to call the same summary endpoint with month/year params for the previous 6 months.
-    try {
-      const seriesLen = 6
-      const incomeSeries: number[] = []
-      const expenseSeries: number[] = []
-      for (let i = seriesLen - 1; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-        const first = new Date(d.getFullYear(), d.getMonth(), 1)
-        const last = new Date(d.getFullYear(), d.getMonth() + 1, 0)
-        const paramsMonth = new URLSearchParams({
-          minDate: formatDate(first),
-          maxDate: formatDate(last),
-        })
-        try {
-          const s = await accountingService.getAccountingSummary(paramsMonth)
-          const income = typeof s?.income === 'number' ? s.income : 0
-          const expense = typeof s?.expense === 'number' ? s.expense : 0
-          incomeSeries.push(income)
-          expenseSeries.push(expense)
-        } catch (err) {
-          // If one month fails, push 0 to keep series length consistent
-          console.debug('month series fetch failed', {
-            err,
-            minDate: paramsMonth.get('minDate'),
-            maxDate: paramsMonth.get('maxDate'),
-          })
-          incomeSeries.push(0)
-          expenseSeries.push(0)
-        }
-      }
-      if (finWidget) {
-        // merge series into existing data prop in a typed/guarded way
-        const existing = (finWidget.props && (finWidget.props as Record<string, unknown>).data) as
-          | Record<string, unknown>
-          | undefined
-        finWidget.props = reactive({
-          ...(finWidget.props || {}),
-          data: { ...(existing || {}), series: { income: incomeSeries, expense: expenseSeries } },
-        })
-      }
-    } catch (err) {
-      // ignore series build errors
-      console.debug('series build failed', err)
-    }
+    // TODO: Add data fetching for habits widget when API is ready
   } catch (err) {
     // Non-blocking: keep sample data but log for debugging
     console.error('Error fetching dashboard previews', err)

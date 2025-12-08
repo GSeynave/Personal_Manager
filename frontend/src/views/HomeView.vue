@@ -13,29 +13,19 @@ const features = [
     description: 'Organize your tasks efficiently with our intuitive todo system'
   },
   {
+    icon: '🎯',
+    title: 'Habits Tracking',
+    description: 'Build better habits and track your daily progress'
+  },
+  {
     icon: '💰',
     title: 'Accounting',
     description: 'Track your finances and manage your budget with ease'
   },
   {
-    icon: '🍎',
-    title: 'Diet Tracking',
-    description: 'Monitor your nutrition and maintain healthy eating habits'
-  },
-  {
-    icon: '⚡',
-    title: 'Energy Monitoring',
-    description: 'Track your energy levels throughout the day'
-  },
-  {
-    icon: '📅',
-    title: 'Calendar',
-    description: 'Stay organized with an integrated calendar system'
-  },
-  {
-    icon: '😴',
-    title: 'Sleep Tracking',
-    description: 'Monitor your sleep patterns for better rest'
+    icon: '🎮',
+    title: 'Gamification',
+    description: 'Earn XP, level up, and unlock achievements as you progress'
   }
 ]
 

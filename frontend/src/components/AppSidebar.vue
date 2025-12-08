@@ -49,21 +49,7 @@ const categories = ref<ModuleCategory[]>([
     label: 'Wellness & Health',
     color: 'health',
     modules: [
-      { id: 'diet', label: 'Diet', to: '/diet', locked: true },
-      { id: 'sleep', label: 'Sleep', to: '/sleep', locked: true },
-      { id: 'fitness', label: 'Fitness', to: '/fitness', locked: true },
-      { id: 'health', label: 'Health', to: '/health', locked: true },
       { id: 'habits', label: 'Habits', to: '/habits' },
-    ],
-  },
-  {
-    id: 'alimentation',
-    label: 'Food & Nutrition',
-    color: 'nutrition',
-    modules: [
-      { id: 'calorie_tracking', label: 'Calorie Tracking', to: '/calorie-tracking', locked: true },
-      { id: 'grocery_list', label: 'Grocery List', to: '/grocery-list', locked: true },
-      { id: 'intake_calculator', label: 'Intake Calculator', to: '/intake-calculator', locked: true },
     ],
   },
   {
@@ -72,10 +58,6 @@ const categories = ref<ModuleCategory[]>([
     color: 'productivity',
     modules: [
       { id: 'todo', label: 'Todo', to: '/todo' },
-      { id: 'projects', label: 'Projects', to: '/projects', locked: true },
-      { id: 'pomodoro', label: 'Pomodoro', to: '/pomodoro', locked: true },
-      { id: 'calendar', label: 'Calendar', to: '/calendar', locked: true },
-      { id: 'notes', label: 'Notes', to: '/notes', locked: true },
     ],
   },
   {
@@ -83,38 +65,7 @@ const categories = ref<ModuleCategory[]>([
     label: 'Finance & Resources',
     color: 'accounting',
     modules: [
-      { id: 'accounting', label: 'Accounting', to: '/accounting', locked: true },
-      { id: 'subscription', label: 'Subscription', to: '/subscription', locked: true },
-      { id: 'debts', label: 'Debts', to: '/debts', locked: true },
-      { id: 'energy', label: 'Energy', to: '/energy', locked: true },
-    ],
-  },
-  // {
-  //   id: 'personal',
-  //   label: 'Personal Development',
-  //   color: 'achievement',
-  //   modules: [
-  //     { id: 'goals', label: 'Goals', to: '/goals', locked: true },
-  //     { id: 'learning', label: 'Learning', to: '/learning', locked: true },
-  //   ],
-  // },
-  {
-    id: 'hobbies',
-    label: 'Hobbies',
-    color: 'primary',
-    modules: [
-      { id: 'poi', label: 'POI', to: '/poi', locked: true },
-      { id: 'series', label: 'Series & Films', to: '/series', locked: true },
-      { id: 'games', label: 'Games', to: '/games', locked: true },
-    ],
-  },
-  {
-    id: 'social',
-    label: 'Social',
-    color: 'primary',
-    modules: [
-      { id: 'friends', label: 'Friends', to: '/friends', locked: true },
-      { id: 'messages', label: 'Messages', to: '/messages', locked: true },
+      { id: 'accounting', label: 'Accounting', to: '/accounting' },
     ],
   },
 ])
