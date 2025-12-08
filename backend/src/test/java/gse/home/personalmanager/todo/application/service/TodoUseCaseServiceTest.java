@@ -11,8 +11,11 @@ import gse.home.personalmanager.todo.infrastructure.repository.TodoGroupReposito
 import gse.home.personalmanager.todo.infrastructure.repository.TodoRepository;
 import gse.home.personalmanager.unit.UnitTestBase;
 import gse.home.personalmanager.user.domain.model.AppUser;
+import gse.home.personalmanager.user.domain.model.AppUserPrincipal;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -49,6 +52,12 @@ class TodoUseCaseServiceTest extends UnitTestBase {
     @Mock
     private Todo mockTodo;
 
+    @Mock
+    private gse.home.personalmanager.gamification.config.GamificationConfig gamificationConfig;
+
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher eventPublisher;
+
     @InjectMocks
     private TodoUseCaseService todoUseCaseService;
 
@@ -65,6 +74,20 @@ class TodoUseCaseServiceTest extends UnitTestBase {
 
         mockUser = new AppUser();
         mockUser.setId(userId);
+        mockUser.setEmail("test@example.com");
+        mockUser.setFirebaseUid("test-firebase-uid");
+        mockUser.setRole("ROLE_USER");
+
+        // Setup SecurityContext
+        AppUserPrincipal principal = new AppUserPrincipal(mockUser);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities())
+        );
+
+        // Setup GamificationConfig mock (lenient because not all tests use it)
+        var essenceConfig = new gse.home.personalmanager.gamification.config.GamificationConfig.Essence();
+        essenceConfig.setTaskCompleted(10);
+        lenient().when(gamificationConfig.getEssence()).thenReturn(essenceConfig);
 
         mockTodoDTO = new TodoDTO();
         mockTodoDTO.setTitle("Test Todo");

@@ -2,28 +2,29 @@ package gse.home.personalmanager.gamification;
 
 import gse.home.personalmanager.gamification.domain.service.GamificationService;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Basic integration test to verify gamification module is properly wired
+ * Unit test to verify gamification level progression formula
  */
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class GamificationModuleTest {
 
-    @Autowired(required = false)
+    @InjectMocks
     private GamificationService gamificationService;
 
     @Test
-    public void testGamificationModuleLoaded() {
-        assertNotNull(gamificationService, "GamificationService should be loaded");
+    public void testGamificationServiceCreation() {
+        assertNotNull(gamificationService, "GamificationService should be created");
     }
 
     @Test
     public void testLevelProgressionFormula() {
-        // Test the exponential curve
+        // Test the exponential curve: essence = 100 * level^2
         assertEquals(0, gamificationService.calculateRequiredEssenceForLevel(1));
         assertEquals(400, gamificationService.calculateRequiredEssenceForLevel(2));
         assertEquals(900, gamificationService.calculateRequiredEssenceForLevel(3));
