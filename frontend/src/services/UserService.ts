@@ -10,6 +10,7 @@ export interface UserIdentity {
   level?: number;
   title?: string;
   borderColor?: string;
+  equippedEmoji?: string;
 }
 
 export default class UserService {

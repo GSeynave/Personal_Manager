@@ -1,18 +1,58 @@
 <script setup lang="ts">
 import { RouterView, useRoute, RouterLink } from 'vue-router'
-import { computed, onMounted, onUnmounted, watch } from 'vue'
+import { computed, onMounted, onUnmounted, watch, ref } from 'vue'
 import { Bell } from 'lucide-vue-next'
 import TopNavbar from './components/TopNavbar.vue'
 import AppSidebar from './components/AppSidebar.vue'
 import ToastNotification from './components/ToastNotification.vue'
+import CircularProgress from './components/CircularProgress.vue'
 import { useAuthStore } from './stores/auth'
 import { useNotificationStore } from './stores/notifications'
 import { webSocketService } from './services/WebSocketService'
 import { SidebarProvider, SidebarInset, SidebarTrigger } from './components/ui/sidebar'
+import axios from 'axios'
 
 const route = useRoute()
 const authStore = useAuthStore()
 const notificationStore = useNotificationStore()
+
+// Game profile for progress bar
+interface GameProfile {
+  totalEssence: number
+  currentLevel: number
+  essenceToNextLevel: number
+  progressToNextLevel: number
+}
+
+const gameProfile = ref<GameProfile | null>(null)
+const isLevelingUp = ref(false)
+
+// Fetch game profile
+const fetchGameProfile = async () => {
+  if (!authStore.isAuthenticated) return
+  try {
+    const response = await axios.get('/api/gamification/profile')
+    const oldLevel = gameProfile.value?.currentLevel
+    gameProfile.value = response.data
+    
+    // Detect level up
+    if (oldLevel && gameProfile.value && gameProfile.value.currentLevel > oldLevel) {
+      isLevelingUp.value = true
+      setTimeout(() => isLevelingUp.value = false, 2000)
+    }
+  } catch (error) {
+    console.error('Failed to fetch game profile:', error)
+  }
+}
+
+// Fetch profile on mount and when authenticated
+watch(() => authStore.isAuthenticated, (isAuth) => {
+  if (isAuth) {
+    fetchGameProfile()
+  } else {
+    gameProfile.value = null
+  }
+}, { immediate: true })
 
 // WebSocket connection management
 let isWebSocketInitialized = false
@@ -46,6 +86,11 @@ watch(
         webSocketService.onNotification((notification) => {
           console.log('📬 Notification received in App.vue:', notification)
           notificationStore.addNotification(notification)
+          
+          // Refresh game profile when essence/level changes
+          if (['ESSENCE_GAINED', 'LEVEL_UP'].includes(notification.type)) {
+            fetchGameProfile()
+          }
         })
       } catch (error) {
         console.error('❌ Error connecting WebSocket:', error)
@@ -133,21 +178,29 @@ function getUserAvatar() {
             <RouterLink to="/progress" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div class="flex flex-col items-end gap-0.5 leading-none">
               <span class="text-sm font-semibold">{{ authStore.userIdentity?.userTag || authStore.userEmail }}</span>
-              <span class="text-xs font-medium" :style="{ color: authStore.userIdentity?.borderColor || '#4f46e5' }">
+              <span class="text-xs font-medium flex items-center gap-1" :style="{ color: authStore.userIdentity?.borderColor || '#4f46e5' }">
+                <span v-if="authStore.userIdentity?.equippedEmoji" class="text-sm">{{ authStore.userIdentity.equippedEmoji }}</span>
                 {{ authStore.userIdentity?.title || 'Beginner' }}
               </span>
             </div>
-            <div 
-              class="flex aspect-square size-10 items-center justify-center rounded-full overflow-hidden"
-              :style="{ border: `3px solid ${authStore.userIdentity?.borderColor || '#4f46e5'}` }"
+            <CircularProgress
+              :progress="gameProfile?.progressToNextLevel || 0"
+              :size="48"
+              :stroke-width="3"
+              :progress-color="authStore.userIdentity?.borderColor || '#6366f1'"
+              :is-leveling-up="isLevelingUp"
             >
-              <img 
-                v-if="getUserAvatar()" 
-                :src="getUserAvatar()" 
-                :alt="authStore.userIdentity?.userTag || 'User'"
-                class="w-full h-full object-cover"
-              />
-            </div>
+              <div 
+                class="flex aspect-square w-10 h-10 items-center justify-center rounded-full overflow-hidden bg-muted"
+              >
+                <img 
+                  v-if="getUserAvatar()" 
+                  :src="getUserAvatar()" 
+                  :alt="authStore.userIdentity?.userTag || 'User'"
+                  class="w-full h-full object-cover rounded-full"
+                />
+              </div>
+            </CircularProgress>
           </RouterLink>
           </div>
         </header>

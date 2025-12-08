@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { Trophy, Gift, TrendingUp, Lock, Check, Sparkles } from 'lucide-vue-next'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
 import axios from 'axios'
 
 const authStore = useAuthStore()
@@ -78,6 +83,8 @@ const equipReward = async (rewardId: string) => {
     // Reload rewards to update equipped status
     const res = await axios.get('/api/gamification/rewards')
     rewards.value = res.data
+    // Reload user identity to update emoji in navbar
+    await authStore.fetchUserIdentity()
   } catch (err: any) {
     console.error('Error equipping reward:', err)
   }
@@ -115,433 +122,229 @@ const getSourceLabel = (source: string) => {
 </script>
 
 <template>
-  <div class="progress-view">
-    <div class="container">
-      <h1 class="page-title">Your Progress</h1>
-      
-      <div v-if="loading" class="loading-state">
-        <p>Loading your progress...</p>
+  <main class="p-6 min-h-screen space-y-8">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="flex items-center gap-3 mb-2">
+        <TrendingUp class="w-8 h-8 text-[#A855F7]" />
+        <h1 class="text-3xl font-bold text-foreground">Your Progress</h1>
       </div>
-      
-      <div v-else-if="error" class="error-state">
-        <p>{{ error }}</p>
-      </div>
-      
-      <div v-else class="progress-content">
-        <!-- Profile Card -->
-        <div v-if="profile" class="profile-card card">
-          <div class="profile-header">
-            <div class="profile-icon">⭐</div>
-            <div class="profile-info">
-              <h2>{{ profile.currentTitle }}</h2>
-              <p class="user-name">{{ authStore.userIdentity?.userTag || 'User' }}</p>
+      <p class="text-sm text-[#A855F7]">Track your achievements, rewards, and level progression</p>
+    </div>
+
+    <!-- Loading State -->
+    <div v-if="loading" class="flex items-center justify-center py-12">
+      <div class="text-muted-foreground">Loading your progress...</div>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="error" class="flex items-center justify-center py-12">
+      <Card class="max-w-md">
+        <CardContent class="pt-6">
+          <p class="text-destructive">{{ error }}</p>
+        </CardContent>
+      </Card>
+    </div>
+
+    <!-- Main Content -->
+    <div v-else class="space-y-6">
+      <!-- Profile Card -->
+      <Card v-if="profile" class="bg-gradient-to-br from-card to-muted/30">
+        <CardHeader>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="flex items-center justify-center w-16 h-16 rounded-full bg-[#A855F7]/10 text-4xl">
+                ⭐
+              </div>
+              <div>
+                <CardTitle class="text-2xl flex items-center gap-2">
+                  <span v-if="equippedRewards.length > 0 && equippedRewards[0]?.type === 'EMOJI'" class="text-3xl">
+                    {{ equippedRewards[0]?.value }}
+                  </span>
+                  {{ profile.currentTitle }}
+                </CardTitle>
+                <CardDescription class="text-base mt-1">
+                  {{ authStore.userIdentity?.userTag || 'User' }}
+                </CardDescription>
+              </div>
             </div>
-            <div class="level-badge">
-              <span class="level-number">{{ profile.currentLevel }}</span>
-              <span class="level-label">Level</span>
+            <div class="flex flex-col items-center px-6 py-3 bg-card rounded-lg border-2 border-[#A855F7]">
+              <span class="text-3xl font-bold text-[#A855F7]">{{ profile.currentLevel }}</span>
+              <span class="text-xs text-muted-foreground uppercase tracking-wide">Level</span>
             </div>
           </div>
+        </CardHeader>
+        <CardContent class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-muted-foreground">Total Essence</span>
+            <span class="text-2xl font-bold text-foreground">{{ profile.totalEssence }}</span>
+          </div>
           
-          <div class="essence-section">
-            <div class="essence-info">
-              <span class="essence-label">Total Essence</span>
-              <span class="essence-value">{{ profile.totalEssence }}</span>
+          <div class="space-y-2">
+            <div class="h-3 bg-muted rounded-full overflow-hidden">
+              <div 
+                class="h-full bg-gradient-to-r from-[#A855F7] to-[#EC4899] rounded-full transition-all duration-500"
+                :style="{ width: `${profile.progressToNextLevel}%` }"
+              />
             </div>
-            <div class="progress-bar">
-              <div class="progress-fill" :style="{ width: `${profile.progressToNextLevel}%` }"></div>
+            <div class="flex items-center justify-center">
+              <span class="text-xs text-muted-foreground">
+                {{ profile.essenceToNextLevel }} essence to level {{ profile.currentLevel + 1 }}
+              </span>
             </div>
-            <div class="next-level-info">
-              <span>{{ profile.essenceToNextLevel }} to next level</span>
-            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Achievements Section -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-3">
+          <Trophy class="w-6 h-6 text-[#F59E0B]" />
+          <h2 class="text-2xl font-semibold text-foreground">Achievements</h2>
+        </div>
+
+        <!-- Unlocked Achievements -->
+        <div v-if="unlockedAchievements.length > 0" class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-medium text-foreground">Unlocked</h3>
+            <Badge variant="secondary">{{ unlockedAchievements.length }}</Badge>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card
+              v-for="achievement in unlockedAchievements"
+              :key="achievement.id"
+              class="hover:shadow-md transition-all"
+            >
+              <CardHeader class="pb-3">
+                <div class="flex items-start gap-3">
+                  <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-500/10">
+                    <Check class="w-5 h-5 text-green-600" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <CardTitle class="text-base">{{ achievement.name }}</CardTitle>
+                    <CardDescription class="mt-1">{{ achievement.description }}</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Badge class="bg-[#A855F7] hover:bg-[#A855F7]/80">
+                  <Sparkles class="w-3 h-3 mr-1" />
+                  +{{ achievement.essenceReward }} essence
+                </Badge>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
-        <!-- Achievements Section -->
-        <div class="section">
-          <h2 class="section-title">🏆 Achievements</h2>
-          
-          <div v-if="unlockedAchievements.length > 0" class="achievements-group">
-            <h3 class="subsection-title">Unlocked ({{ unlockedAchievements.length }})</h3>
-            <div class="achievements-grid">
-              <div v-for="achievement in unlockedAchievements" :key="achievement.id" class="achievement-card unlocked">
-                <div class="achievement-icon">✓</div>
-                <div class="achievement-info">
-                  <h4>{{ achievement.name }}</h4>
-                  <p>{{ achievement.description }}</p>
-                  <span class="essence-reward">+{{ achievement.essenceReward }} essence</span>
-                </div>
-              </div>
-            </div>
+        <!-- Locked Achievements -->
+        <div v-if="lockedAchievements.length > 0" class="space-y-3">
+          <Separator />
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-medium text-muted-foreground">Locked</h3>
+            <Badge variant="outline">{{ lockedAchievements.length }}</Badge>
           </div>
-
-          <div v-if="lockedAchievements.length > 0" class="achievements-group">
-            <h3 class="subsection-title">Locked ({{ lockedAchievements.length }})</h3>
-            <div class="achievements-grid">
-              <div v-for="achievement in lockedAchievements" :key="achievement.id" class="achievement-card locked">
-                <div class="achievement-icon">🔒</div>
-                <div class="achievement-info">
-                  <h4>{{ achievement.name }}</h4>
-                  <p>{{ achievement.description }}</p>
-                  <span class="essence-reward">+{{ achievement.essenceReward }} essence</span>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card
+              v-for="achievement in lockedAchievements"
+              :key="achievement.id"
+              class="opacity-60 hover:opacity-80 transition-opacity"
+            >
+              <CardHeader class="pb-3">
+                <div class="flex items-start gap-3">
+                  <div class="flex items-center justify-center w-10 h-10 rounded-full bg-muted">
+                    <Lock class="w-5 h-5 text-muted-foreground" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <CardTitle class="text-base">{{ achievement.name }}</CardTitle>
+                    <CardDescription class="mt-1">{{ achievement.description }}</CardDescription>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </CardHeader>
+              <CardContent>
+                <Badge variant="outline">
+                  <Sparkles class="w-3 h-3 mr-1" />
+                  +{{ achievement.essenceReward }} essence
+                </Badge>
+              </CardContent>
+            </Card>
           </div>
         </div>
+      </div>
 
-        <!-- Rewards Section -->
-        <div v-if="ownedRewards.length > 0" class="section">
-          <h2 class="section-title">🎁 Rewards</h2>
-          <div class="rewards-grid">
-            <div v-for="reward in ownedRewards" :key="reward.id" 
-                 class="reward-card" 
-                 :class="{ equipped: reward.equipped }">
-              <div class="reward-header">
-                <span class="reward-icon">{{ reward.type === 'EMOJI' ? reward.value : '🎨' }}</span>
-                <span v-if="reward.equipped" class="equipped-badge">Equipped</span>
+      <!-- Rewards Section -->
+      <div v-if="ownedRewards.length > 0" class="space-y-4">
+        <div class="flex items-center gap-3">
+          <Gift class="w-6 h-6 text-[#10B981]" />
+          <h2 class="text-2xl font-semibold text-foreground">Rewards</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <Card
+            v-for="reward in ownedRewards"
+            :key="reward.id"
+            class="hover:shadow-md transition-all"
+            :class="{ 'ring-2 ring-[#A855F7]': reward.equipped }"
+          >
+            <CardHeader>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-4xl">{{ reward.type === 'EMOJI' ? reward.value : '🎨' }}</span>
+                <Badge v-if="reward.equipped" class="bg-[#A855F7] hover:bg-[#A855F7]/80">
+                  <Check class="w-3 h-3 mr-1" />
+                  Equipped
+                </Badge>
               </div>
-              <h4>{{ reward.name }}</h4>
-              <p>{{ reward.description }}</p>
-              <button v-if="!reward.equipped" @click="equipReward(reward.id)" class="btn-equip">
+              <CardTitle class="text-base">{{ reward.name }}</CardTitle>
+              <CardDescription>{{ reward.description }}</CardDescription>
+            </CardHeader>
+            <CardContent v-if="!reward.equipped">
+              <Button 
+                @click="equipReward(reward.id)" 
+                variant="outline" 
+                size="sm"
+                class="w-full"
+              >
                 Equip
-              </button>
-            </div>
-          </div>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div v-if="transactions.length > 0" class="space-y-4">
+        <div class="flex items-center gap-3">
+          <TrendingUp class="w-6 h-6 text-[#3B82F6]" />
+          <h2 class="text-2xl font-semibold text-foreground">Recent Activity</h2>
         </div>
 
-        <!-- Recent Activity -->
-        <div v-if="transactions.length > 0" class="section">
-          <h2 class="section-title">📊 Recent Activity</h2>
-          <div class="transactions-list">
-            <div v-for="transaction in transactions.slice(0, 10)" :key="transaction.id" class="transaction-item">
-              <div class="transaction-info">
-                <span class="transaction-source">{{ getSourceLabel(transaction.source) }}</span>
-                <span class="transaction-date">{{ formatDate(transaction.timestamp) }}</span>
+        <Card>
+          <CardContent class="p-0">
+            <div
+              v-for="(transaction, index) in transactions.slice(0, 10)"
+              :key="transaction.id"
+              class="flex items-center justify-between p-4 hover:bg-accent/50 transition-colors"
+              :class="{ 'border-b border-border': index < Math.min(transactions.length, 10) - 1 }"
+            >
+              <div class="flex flex-col gap-1">
+                <span class="font-medium text-foreground">{{ getSourceLabel(transaction.source) }}</span>
+                <span class="text-sm text-muted-foreground">{{ formatDate(transaction.timestamp) }}</span>
               </div>
-              <span class="transaction-amount">+{{ transaction.amount }}</span>
+              <Badge class="bg-green-500/10 text-green-600 hover:bg-green-500/20 border-green-500/20">
+                +{{ transaction.amount }}
+              </Badge>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <style scoped>
-.progress-view {
-  padding: 2rem;
-  min-height: 100vh;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.page-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  color: var(--color-heading);
-}
-
-.loading-state,
-.error-state {
-  text-align: center;
-  padding: 3rem;
-  color: var(--color-text);
-}
-
-.progress-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.card {
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.profile-card {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-  color: white;
-  border: none;
-}
-
-.profile-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.profile-icon {
-  font-size: 3rem;
-}
-
-.profile-info {
-  flex: 1;
-}
-
-.profile-info h2 {
-  font-size: 1.5rem;
-  margin: 0;
-}
-
-.user-name {
-  opacity: 0.9;
-  margin: 0.25rem 0 0;
-}
-
-.level-badge {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 0.75rem 1.25rem;
-  border-radius: 8px;
-}
-
-.level-number {
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-.level-label {
-  font-size: 0.875rem;
-  opacity: 0.9;
-}
-
-.essence-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.essence-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.essence-label {
-  font-size: 0.875rem;
-  opacity: 0.9;
-}
-
-.essence-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.progress-bar {
-  height: 12px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 6px;
-  transition: width 0.3s ease;
-}
-
-.next-level-info {
-  text-align: center;
-  font-size: 0.875rem;
-  opacity: 0.9;
-}
-
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.section-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-heading);
-}
-
-.subsection-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  margin-top: 1rem;
-}
-
-.achievements-group {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.achievements-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
-}
-
-.achievement-card {
-  background: var(--color-background);
-  border: 2px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1rem;
-  display: flex;
-  gap: 1rem;
-  transition: all 0.2s ease;
-}
-
-.achievement-card.unlocked {
-  border-color: var(--color-success);
-  background: var(--color-success-background);
-}
-
-.achievement-card.locked {
-  opacity: 0.6;
-}
-
-.achievement-icon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-
-.achievement-info h4 {
-  margin: 0 0 0.25rem;
-  font-size: 1rem;
-  color: var(--color-heading);
-}
-
-.achievement-info p {
-  margin: 0 0 0.5rem;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-}
-
-.essence-reward {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  background: var(--color-accent);
-  color: white;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.rewards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.reward-card {
-  background: var(--color-background);
-  border: 2px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-}
-
-.reward-card.equipped {
-  border-color: var(--color-primary);
-  background: var(--color-primary-background);
-}
-
-.reward-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.reward-icon {
-  font-size: 2rem;
-}
-
-.equipped-badge {
-  padding: 0.25rem 0.5rem;
-  background: var(--color-primary);
-  color: white;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.reward-card h4 {
-  margin: 0;
-  font-size: 1rem;
-  color: var(--color-heading);
-}
-
-.reward-card p {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  flex: 1;
-}
-
-.btn-equip {
-  padding: 0.5rem 1rem;
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-equip:hover {
-  background: var(--color-primary-dark);
-}
-
-.transactions-list {
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.transaction-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.transaction-item:last-child {
-  border-bottom: none;
-}
-
-.transaction-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.transaction-source {
-  font-weight: 600;
-  color: var(--color-heading);
-}
-
-.transaction-date {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-}
-
-.transaction-amount {
-  font-weight: 700;
-  font-size: 1.125rem;
-  color: var(--color-success);
+.page-header {
+  margin-bottom: 24px;
+  padding-left: 12px;
 }
 </style>

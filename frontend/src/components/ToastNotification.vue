@@ -1,23 +1,39 @@
 <script setup lang="ts">
 import { useNotificationStore } from '@/stores/notifications'
+import { X } from 'lucide-vue-next'
 import { computed } from 'vue'
 
 const notificationStore = useNotificationStore()
 
 const notification = computed(() => notificationStore.currentToast)
 
-const getNotificationColor = (type: string) => {
+const getNotificationStyle = (type: string) => {
   switch (type) {
     case 'LEVEL_UP':
-      return 'bg-gradient-to-r from-purple-500 to-pink-500'
+      return {
+        borderColor: '#A855F7', // Purple
+        iconColor: '#A855F7'
+      }
     case 'ACHIEVEMENT_UNLOCKED':
-      return 'bg-gradient-to-r from-yellow-400 to-orange-500'
+      return {
+        borderColor: '#F59E0B', // Amber
+        iconColor: '#F59E0B'
+      }
     case 'ESSENCE_GAINED':
-      return 'bg-gradient-to-r from-blue-500 to-cyan-500'
+      return {
+        borderColor: '#3B82F6', // Blue
+        iconColor: '#3B82F6'
+      }
     case 'REWARD_UNLOCKED':
-      return 'bg-gradient-to-r from-green-500 to-emerald-500'
+      return {
+        borderColor: '#10B981', // Green
+        iconColor: '#10B981'
+      }
     default:
-      return 'bg-gradient-to-r from-gray-500 to-gray-600'
+      return {
+        borderColor: 'hsl(var(--border))',
+        iconColor: 'hsl(var(--foreground))'
+      }
   }
 }
 </script>
@@ -29,13 +45,25 @@ const getNotificationColor = (type: string) => {
       class="toast-container"
       @click="notificationStore.hideToast()"
     >
-      <div class="toast" :class="getNotificationColor(notification.type)">
+      <div 
+        class="toast"
+        :style="{
+          '--toast-border-color': getNotificationStyle(notification.type).borderColor,
+          '--toast-icon-color': getNotificationStyle(notification.type).iconColor
+        }"
+      >
         <div class="toast-icon">{{ notification.icon }}</div>
         <div class="toast-content">
           <h4 class="toast-title">{{ notification.title }}</h4>
           <p class="toast-message">{{ notification.message }}</p>
         </div>
-        <button class="toast-close" @click.stop="notificationStore.hideToast()">×</button>
+        <button 
+          class="toast-close" 
+          @click.stop="notificationStore.hideToast()"
+          aria-label="Close notification"
+        >
+          <X class="w-4 h-4" />
+        </button>
       </div>
     </div>
   </Transition>
@@ -54,13 +82,21 @@ const getNotificationColor = (type: string) => {
   min-width: 320px;
   max-width: 400px;
   padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 6px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 0.75rem;
+  background: hsl(var(--card));
+  border: 2px solid var(--toast-border-color);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 6px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  color: white;
+  color: hsl(var(--foreground));
   animation: bounce 0.5s ease-out;
+  transition: all 0.2s ease;
+}
+
+.toast:hover {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .toast-icon {
@@ -68,6 +104,7 @@ const getNotificationColor = (type: string) => {
   line-height: 1;
   flex-shrink: 0;
   animation: pulse 1s infinite;
+  filter: drop-shadow(0 0 4px var(--toast-icon-color));
 }
 
 @keyframes pulse {
@@ -98,41 +135,43 @@ const getNotificationColor = (type: string) => {
 
 .toast-content {
   flex: 1;
+  min-width: 0;
 }
 
 .toast-title {
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
   margin: 0 0 0.25rem 0;
   line-height: 1.2;
+  color: hsl(var(--foreground));
 }
 
 .toast-message {
   font-size: 0.875rem;
   margin: 0;
-  opacity: 0.95;
   line-height: 1.4;
+  color: hsl(var(--muted-foreground));
 }
 
 .toast-close {
-  background: rgba(255, 255, 255, 0.2);
+  background: transparent;
   border: none;
-  color: white;
-  font-size: 1.5rem;
-  line-height: 1;
+  color: hsl(var(--muted-foreground));
   width: 24px;
   height: 24px;
-  border-radius: 50%;
+  border-radius: 0.375rem;
   cursor: pointer;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  padding: 0;
 }
 
 .toast-close:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: hsl(var(--accent));
+  color: hsl(var(--foreground));
 }
 
 /* Transition */

@@ -20,7 +20,7 @@ public class RateLimitConfig {
 
         // CONFIGURATION:
         // 1. bucketRequests: The number of requests allowed (matches setRequests)
-        registrationBean.addInitParameter("bucketRequests", "20");
+        registrationBean.addInitParameter("bucketRequests", "200");
 
         // 2. bucketDuration: The window in seconds (matches setDuration)
         registrationBean.addInitParameter("bucketDuration", "60");

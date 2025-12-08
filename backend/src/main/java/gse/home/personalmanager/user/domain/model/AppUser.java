@@ -8,7 +8,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Data
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+    @UniqueConstraint(columnNames = "firebaseUid", name = "uk_users_firebase_uid")
+})
 @EntityListeners(AuditingEntityListener.class)
 public class AppUser {
 
@@ -16,6 +18,7 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String firebaseUid;
     private String email;
     private String userTag;
