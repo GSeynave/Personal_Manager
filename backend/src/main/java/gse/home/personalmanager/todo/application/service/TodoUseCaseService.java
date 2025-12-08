@@ -1,5 +1,7 @@
 package gse.home.personalmanager.todo.application.service;
 
+import gse.home.personalmanager.gamification.config.GamificationConfig;
+import gse.home.personalmanager.gamification.domain.event.TaskCompletedEvent;
 import gse.home.personalmanager.todo.application.dto.TodoDTO;
 import gse.home.personalmanager.todo.application.dto.TodosViewDTO;
 import gse.home.personalmanager.todo.application.mapper.TodoMapper;
@@ -13,6 +15,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -25,6 +28,8 @@ public class TodoUseCaseService {
     private final TodoTitleEnhancer todoTitleEnhancer;
     private final TodoService todoService;
     private final TodoGroupRepository todoGroupRepository;
+    private final ApplicationEventPublisher eventPublisher;
+    private final GamificationConfig gamificationConfig;
 
 
     /**
@@ -91,12 +96,33 @@ public class TodoUseCaseService {
 
         // Step 2: prepare data
         var todoGroup = getTodoGroup(todoDTO.getTodoGroupId());
+        
+        // Check if this is a completion event (was not completed, now is completed)
+        boolean isNewCompletion = !Boolean.TRUE.equals(entity.getCompleted()) 
+                                  && Boolean.TRUE.equals(todoDTO.getCompleted())
+                                  && !Boolean.TRUE.equals(entity.getEssenceAwarded());
 
         // Step 3: update entity
         entity.updateDetails(todoDTO.getCompleted(), todoGroup);
+        
+        // Step 4: Mark essence as awarded if completing
+        if (isNewCompletion) {
+            entity.setEssenceAwarded(true);
+        }
 
-        // Step 3: persist
+        // Step 5: persist
         todoRepository.save(entity);
+        
+        // Step 6: Publish completion event
+        if (isNewCompletion) {
+            log.info("Publishing TaskCompletedEvent for todo {} and user {}", id, userId);
+            eventPublisher.publishEvent(new TaskCompletedEvent(
+                    this,
+                    id,
+                    userId,
+                    gamificationConfig.getEssence().getTaskCompleted()
+            ));
+        }
     }
 
     @Transactional

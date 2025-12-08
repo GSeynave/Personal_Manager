@@ -41,6 +41,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
 
+                        // WebSocket endpoints - permit initial handshake, auth handled by interceptor
+                        .requestMatchers("/ws/**").permitAll()
+
                         // Explicitly allow the error endpoint so 404's are returned
                         .requestMatchers("/error").permitAll()
 

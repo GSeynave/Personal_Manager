@@ -57,6 +57,16 @@ const categories = ref<ModuleCategory[]>([
     ],
   },
   {
+    id: 'alimentation',
+    label: 'Food & Nutrition',
+    color: 'nutrition',
+    modules: [
+      { id: 'calorie_tracking', label: 'Calorie Tracking', to: '/calorie-tracking', locked: true },
+      { id: 'grocery_list', label: 'Grocery List', to: '/grocery-list', locked: true },
+      { id: 'intake_calculator', label: 'Intake Calculator', to: '/intake-calculator', locked: true },
+    ],
+  },
+  {
     id: 'productivity',
     label: 'Productivity & Focus',
     color: 'productivity',

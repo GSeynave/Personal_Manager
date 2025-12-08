@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth';
 const API_URL = `/api/users`;
 
 export interface UserIdentity {
+  id?: number;
   userTag?: string;
   email?: string;
   level?: number;

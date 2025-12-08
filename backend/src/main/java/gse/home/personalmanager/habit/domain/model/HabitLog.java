@@ -36,6 +36,9 @@ public class HabitLog {
     private Boolean completed = false; // ref to YES_NO HabitType
     private Integer count = 0; // ref to NUMERIC HabitType
     private Integer duration = 0; // ref to DURATION HabitType
+    
+    @Column(name = "essence_awarded", nullable = false)
+    private Boolean essenceAwarded = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "habit_id")

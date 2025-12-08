@@ -42,6 +42,9 @@ public class Todo {
     private String assigned_to;
     @Version
     private Long version;
+    
+    @Column(name = "essence_awarded", nullable = false)
+    private Boolean essenceAwarded = false;
 
 
     @ManyToOne(fetch = FetchType.LAZY)

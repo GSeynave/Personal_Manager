@@ -46,6 +46,11 @@ const handleLogin = () => {
   router.push('/login')
 }
 
+const goToProgress = () => {
+  router.push('/progress')
+  isUserMenuOpen.value = false
+}
+
 const goToProfile = () => {
   router.push('/profile')
   isUserMenuOpen.value = false
@@ -91,11 +96,13 @@ const themeIcons = {
           </div>
         </div>
         <div class="user-section">
-          <button v-if="!authStore.isAuthenticated" class="btn-login" @click="handleLogin">Login</button>
+          <div v-if="!authStore.isAuthenticated" class="btn-login" @click="handleLogin">Login</button>
           <div v-else class="user-menu-wrapper">
-            <button class="user-profile-btn" @click="toggleUserMenu">
+            <button class="user-profile-btn" @click="goToProgress">
               <span class="profile-icon">👤</span>
               <span class="username">{{ displayName }}</span>
+            </button>
+            <button class="menu-toggle-btn" @click="toggleUserMenu">
               <span class="dropdown-icon" :class="{ open: isUserMenuOpen }">▼</span>
             </button>
             <div v-if="isUserMenuOpen" class="user-dropdown">
@@ -239,6 +246,8 @@ const themeIcons = {
 
 .user-menu-wrapper {
   position: relative;
+  display: flex;
+  gap: 4px;
 }
 
 .user-profile-btn {
@@ -248,7 +257,7 @@ const themeIcons = {
   padding: 8px 12px;
   background: hsl(0, 0%, 100%);
   border: 1px solid hsl(214.3, 31.8%, 91.4%);
-  border-radius: 6px;
+  border-radius: 6px 0 0 6px;
   cursor: pointer;
   font-weight: 500;
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -256,6 +265,26 @@ const themeIcons = {
 }
 
 .user-profile-btn:hover {
+  background: hsl(210, 40%, 96.1%);
+  border-color: hsl(214.3, 31.8%, 85%);
+}
+
+.menu-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: hsl(0, 0%, 100%);
+  border: 1px solid hsl(214.3, 31.8%, 91.4%);
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 36px;
+  width: 36px;
+}
+
+.menu-toggle-btn:hover {
   background: hsl(210, 40%, 96.1%);
   border-color: hsl(214.3, 31.8%, 85%);
 }

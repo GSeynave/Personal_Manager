@@ -1,4 +1,4 @@
 package gse.home.personalmanager.user.application.dto;
 
-public record UserIdentityDto(String email, String userTag) {
+public record UserIdentityDto(Long id, String email, String userTag) {
 }

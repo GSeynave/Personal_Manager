@@ -13,13 +13,15 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         "gse.home.personalmanager.todo.infrastructure.repository",
         "gse.home.personalmanager.accounting.infrastructure.repository",
         "gse.home.personalmanager.user.infrastructure.repository",
-        "gse.home.personalmanager.habit.infrastructure.repository"
+        "gse.home.personalmanager.habit.infrastructure.repository",
+        "gse.home.personalmanager.gamification.infrastructure.repository"
 })
 @EntityScan(basePackages = {
         "gse.home.personalmanager.todo.domain.model",
         "gse.home.personalmanager.accounting.domain.model",
         "gse.home.personalmanager.user.domain.model",
-        "gse.home.personalmanager.habit.domain.model"
+        "gse.home.personalmanager.habit.domain.model",
+        "gse.home.personalmanager.gamification.domain.model"
 })
 @ComponentScan(basePackages = "gse.home.personalmanager")
 @EnableJpaAuditing

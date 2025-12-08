@@ -1,5 +1,7 @@
 package gse.home.personalmanager.habit.application.service;
 
+import gse.home.personalmanager.gamification.config.GamificationConfig;
+import gse.home.personalmanager.gamification.domain.event.HabitCompletedEvent;
 import gse.home.personalmanager.habit.application.dto.HabitLogDTO;
 import gse.home.personalmanager.habit.application.mapper.HabitLogMapper;
 import gse.home.personalmanager.habit.domain.model.HabitLog;
@@ -10,6 +12,7 @@ import gse.home.personalmanager.habit.infrastructure.repository.HabitRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -26,6 +29,8 @@ public class HabitLogUseCaseService {
     private final HabitLogService habitLogService;
     private final HabitService habitService;
     private final HabitLogMapper habitLogMapper;
+    private final ApplicationEventPublisher eventPublisher;
+    private final GamificationConfig gamificationConfig;
 
     /**
      * Retrieves all habit logs for a specified habit.
@@ -68,6 +73,12 @@ public class HabitLogUseCaseService {
                     newLog.setCompleted(false); // Default state
                     return newLog;
                 });
+        
+        // Track if this is a new completion (for gamification)
+        boolean wasNotCompleted = !Boolean.TRUE.equals(logEntity.getCompleted());
+        boolean isNowCompleted = Boolean.TRUE.equals(habitLogDTO.getCompleted());
+        boolean notYetAwarded = !Boolean.TRUE.equals(logEntity.getEssenceAwarded());
+        boolean isNewCompletion = wasNotCompleted && isNowCompleted && notYetAwarded;
 
         // 4. Delegate business logic to pure domain service
         habitLogService.updateLogProgress(
@@ -77,9 +88,28 @@ public class HabitLogUseCaseService {
                 habitLogDTO.getDuration(),
                 habitLogDTO.getCompleted()
         );
+        
+        // 5. Mark essence as awarded if completing for first time
+        if (isNewCompletion) {
+            logEntity.setEssenceAwarded(true);
+        }
 
-        // 5. Persist
-        return habitLogRepository.save(logEntity).getId();
+        // 6. Persist
+        var savedLog = habitLogRepository.save(logEntity);
+        
+        // 7. Publish completion event
+        if (isNewCompletion) {
+            log.info("Publishing HabitCompletedEvent for habit {} log {} and user {}", habitId, savedLog.getId(), userId);
+            eventPublisher.publishEvent(new HabitCompletedEvent(
+                    this,
+                    savedLog.getId(),
+                    habitId,
+                    userId,
+                    gamificationConfig.getEssence().getHabitCompleted()
+            ));
+        }
+        
+        return savedLog.getId();
     }
 
     /**

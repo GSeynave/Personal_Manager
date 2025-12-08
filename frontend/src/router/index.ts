@@ -77,6 +77,12 @@ const router = createRouter({
       component: () => import('../views/ProfileView.vue'),
       meta: { requiresAuth: true }, // Requires auth but not identity
     },
+    {
+      path: '/progress',
+      name: 'progress',
+      component: () => import('../views/ProgressView.vue'),
+      meta: { requiresAuth: true, requiresIdentity: true }, // Requires auth and identity
+    },
   ],
 })
 
