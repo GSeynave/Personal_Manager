@@ -72,7 +72,7 @@ const themeIcons = {
     <div class="navbar-content">
       <!-- App Logo/Name (clickable to go home) -->
       <RouterLink to="/" class="navbar-brand">
-        <h1 class="app-name">🏠 Personal Manager</h1>
+        <h1 class="app-name">Personal Manager</h1>
         <span class="app-subtitle">Dashboard</span>
       </RouterLink>
 
@@ -112,17 +112,16 @@ const themeIcons = {
 
 <style scoped>
 .top-navbar {
-  background: rgba(var(--bg-primary), 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-light);
-  height: 70px;
+  background: hsl(0, 0%, 100%);
+  border-bottom: 1px solid hsl(214.3, 31.8%, 91.4%);
+  height: 60px;
   display: flex;
   align-items: center;
-  padding: 0 var(--spacing-lg);
+  padding: 0 24px;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 .navbar-content {
@@ -136,40 +135,38 @@ const themeIcons = {
 .navbar-brand {
   display: flex;
   align-items: baseline;
-  gap: var(--spacing-sm);
+  gap: 12px;
   text-decoration: none;
   cursor: pointer;
-  transition: transform var(--transition-base);
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .navbar-brand:hover {
-  transform: translateY(-2px);
+  opacity: 0.8;
 }
 
 .navbar-brand:active {
-  transform: translateY(0);
+  opacity: 1;
 }
 
 .app-name {
   margin: 0;
-  font-size: var(--text-2xl);
-  font-weight: var(--fw-bold);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: hsl(222.2, 47.4%, 11.2%);
+  letter-spacing: -0.025em;
 }
 
 .app-subtitle {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  font-weight: var(--fw-medium);
+  font-size: 0.875rem;
+  color: hsl(215.4, 16.3%, 46.9%);
+  font-weight: 500;
 }
 
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: 12px;
 }
 
 .theme-toggle-wrapper {
@@ -177,36 +174,38 @@ const themeIcons = {
 }
 
 .theme-toggle {
-  padding: var(--spacing-sm);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-md);
+  padding: 8px;
+  background: hsl(0, 0%, 100%);
+  border: 1px solid hsl(214.3, 31.8%, 91.4%);
+  border-radius: 6px;
   cursor: pointer;
-  transition: all var(--transition-base);
-  font-size: 1.25rem;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 1.125rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 36px;
+  width: 36px;
 }
 
 .theme-toggle:hover {
-  background: var(--bg-tertiary);
-  transform: translateY(-2px);
+  background: hsl(210, 40%, 96.1%);
+  border-color: hsl(214.3, 31.8%, 85%);
 }
 
 .theme-dropdown {
   position: absolute;
   top: 100%;
   right: 0;
-  margin-top: var(--spacing-sm);
+  margin-top: 8px;
   z-index: 100;
-  animation: slideDown 0.2s ease-out;
+  animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
@@ -221,19 +220,21 @@ const themeIcons = {
 }
 
 .btn-login {
-  padding: var(--spacing-sm) var(--spacing-lg);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: white;
+  padding: 8px 16px;
+  background: hsl(222.2, 47.4%, 11.2%);
+  color: hsl(210, 40%, 98%);
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: var(--fw-semibold);
-  transition: all var(--transition-slow);
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 36px;
 }
 
 .btn-login:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
+  background: hsl(222.2, 47.4%, 11.2%, 0.9);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 
 .user-menu-wrapper {
@@ -243,33 +244,34 @@ const themeIcons = {
 .user-profile-btn {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-xs) var(--spacing-md);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-medium);
-  border-radius: 20px;
+  gap: 8px;
+  padding: 8px 12px;
+  background: hsl(0, 0%, 100%);
+  border: 1px solid hsl(214.3, 31.8%, 91.4%);
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: var(--fw-semibold);
-  transition: all var(--transition-base);
+  font-weight: 500;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 36px;
 }
 
 .user-profile-btn:hover {
-  background: var(--bg-tertiary);
-  border-color: var(--border-medium);
+  background: hsl(210, 40%, 96.1%);
+  border-color: hsl(214.3, 31.8%, 85%);
 }
 
 .profile-icon {
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 .username {
-  font-size: var(--text-sm);
-  color: var(--text-primary);
+  font-size: 0.875rem;
+  color: hsl(222.2, 47.4%, 11.2%);
 }
 
 .dropdown-icon {
-  font-size: 0.7rem;
-  transition: transform var(--transition-base);
+  font-size: 0.625rem;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dropdown-icon.open {
@@ -280,49 +282,51 @@ const themeIcons = {
   position: absolute;
   top: 100%;
   right: 0;
-  margin-top: var(--spacing-sm);
-  background: var(--bg-primary);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-lg);
-  min-width: 160px;
-  box-shadow: var(--shadow-lg);
+  margin-top: 8px;
+  background: hsl(0, 0%, 100%);
+  border: 1px solid hsl(214.3, 31.8%, 91.4%);
+  border-radius: 8px;
+  min-width: 180px;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   z-index: 100;
   overflow: hidden;
+  padding: 4px;
 }
 
 .dropdown-item {
   display: block;
   width: 100%;
-  padding: var(--spacing-md);
+  padding: 8px 12px;
   text-align: left;
   background: transparent;
   border: none;
-  color: var(--text-primary);
+  color: hsl(222.2, 47.4%, 11.2%);
   cursor: pointer;
-  font-size: var(--text-sm);
-  transition: background var(--transition-base);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
+  border-radius: 4px;
 }
 
 .dropdown-item:hover {
-  background: rgba(var(--primary-rgb), 0.1);
-  color: var(--primary);
+  background: hsl(210, 40%, 96.1%);
+  color: hsl(222.2, 47.4%, 11.2%);
 }
 
 .dropdown-divider {
-  margin: var(--spacing-xs) 0;
+  margin: 4px 0;
   border: none;
-  border-top: 1px solid var(--border-light);
+  border-top: 1px solid hsl(214.3, 31.8%, 91.4%);
 }
 
 .logout-btn {
-  color: var(--error);
+  color: hsl(0, 84.2%, 60.2%);
 }
 
 .logout-btn:hover {
-  background: rgba(211, 47, 47, 0.1) !important;
-  color: #b71c1c !important;
+  background: hsl(0, 84.2%, 60.2%, 0.1) !important;
+  color: hsl(0, 84.2%, 60.2%) !important;
 }
 
 @media (max-width: 768px) {

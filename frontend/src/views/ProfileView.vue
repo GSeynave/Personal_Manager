@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import { moduleColor, hexToRgbStr, moduleTintAlpha } from '@/config/moduleColors'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { User, Mail, Tag, Key, LogOut } from 'lucide-vue-next'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -12,172 +18,111 @@ async function handleLogout() {
 </script>
 
 <template>
-  <main class="profile-view">
-    <div class="profile-container">
-      <div class="profile-card">
-        <div class="profile-header">
-          <div class="profile-icon">👤</div>
-          <h1>My Profile</h1>
-        </div>
-
-        <div class="profile-content">
-          <div class="profile-section">
-            <h2>Account Information</h2>
-            
-            <div class="info-row">
-              <span class="label">Email:</span>
-              <span class="value">{{ authStore.userEmail || 'Not available' }}</span>
-            </div>
-
-            <div class="info-row">
-              <span class="label">User Tag:</span>
-              <span class="value tag">{{ authStore.userIdentity?.userTag || 'Not set' }}</span>
-            </div>
-
-            <div class="info-row">
-              <span class="label">User ID:</span>
-              <span class="value code">{{ authStore.userId || 'Not available' }}</span>
-            </div>
-          </div>
-
-          <div class="profile-actions">
-            <button class="btn-logout" @click="handleLogout">
-              Logout
-            </button>
-          </div>
-        </div>
+  <main
+    :style="{
+      '--module-color': moduleColor('todo'),
+      '--module-color-rgb': hexToRgbStr(moduleColor('todo')),
+      '--module-tint-alpha': moduleTintAlpha(moduleColor('todo')),
+    }"
+    class="p-6 min-h-screen space-y-8"
+  >
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="flex items-center gap-3 mb-2">
+        <User class="w-8 h-8 text-productivity" />
+        <h1 class="text-3xl font-bold text-foreground">My Profile</h1>
       </div>
+      <p class="text-sm text-productivity">Manage your account information</p>
+    </div>
+
+    <!-- Content Area -->
+    <div class="max-w-2xl mx-auto space-y-6">
+      <!-- Account Information Card -->
+      <Card>
+        <CardHeader>
+          <CardTitle>Account Information</CardTitle>
+          <CardDescription>Your personal account details</CardDescription>
+        </CardHeader>
+        <CardContent class="space-y-4">
+          <!-- Email -->
+          <div class="flex items-center justify-between p-4 bg-card-item rounded-lg border border-border">
+            <div class="flex items-center gap-3">
+              <Mail class="w-5 h-5 text-muted-foreground" />
+              <div>
+                <p class="text-sm font-medium text-foreground">Email</p>
+                <p class="text-sm text-muted-foreground">{{ authStore.userEmail || 'Not available' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- User Tag -->
+          <div class="flex items-center justify-between p-4 bg-card-item rounded-lg border border-border">
+            <div class="flex items-center gap-3">
+              <Tag class="w-5 h-5 text-muted-foreground" />
+              <div>
+                <p class="text-sm font-medium text-foreground">User Tag</p>
+                <Badge variant="secondary" class="mt-1">
+                  {{ authStore.userIdentity?.userTag || 'Not set' }}
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          <!-- User ID -->
+          <div class="flex items-center justify-between p-4 bg-card-item rounded-lg border border-border">
+            <div class="flex items-center gap-3">
+              <Key class="w-5 h-5 text-muted-foreground" />
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-foreground">User ID</p>
+                <p class="text-xs font-mono text-muted-foreground truncate">
+                  {{ authStore.userId || 'Not available' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Actions Card -->
+      <Card>
+        <CardHeader>
+          <CardTitle>Account Actions</CardTitle>
+          <CardDescription>Manage your session and account settings</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button 
+            variant="destructive" 
+            class="w-full"
+            @click="handleLogout"
+          >
+            <LogOut class="w-4 h-4 mr-2" />
+            Logout
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   </main>
 </template>
 
 <style scoped>
-.profile-view {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: calc(100vh - 70px);
-  padding: 2rem;
+main {
+  padding: var(--spacing-lg, 24px);
+  position: relative;
+  min-height: 100vh;
 }
 
-.profile-container {
-  max-width: 600px;
-  width: 100%;
+main::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  border-radius: 4px 0 0 4px;
 }
 
-.profile-card {
-  background: var(--color-background-soft);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.profile-header {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-  color: white;
-  padding: 2rem;
-  text-align: center;
-}
-
-.profile-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-}
-
-.profile-header h1 {
-  margin: 0;
-  font-size: 1.75rem;
-  font-weight: 600;
-}
-
-.profile-content {
-  padding: 2rem;
-}
-
-.profile-section {
-  margin-bottom: 2rem;
-}
-
-.profile-section h2 {
-  font-size: 1.25rem;
-  color: var(--color-heading);
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--color-border);
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  margin-bottom: 0.5rem;
-  background: var(--color-background);
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-}
-
-.label {
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.value {
-  color: var(--color-text-secondary);
-  text-align: right;
-  max-width: 60%;
-  word-break: break-all;
-}
-
-.value.tag {
-  background: var(--color-primary);
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 16px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.value.code {
-  font-family: monospace;
-  font-size: 0.875rem;
-}
-
-.profile-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--color-border);
-}
-
-.btn-logout {
-  padding: 0.75rem 2rem;
-  background: #ef4444;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-logout:hover {
-  background: #dc2626;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
-}
-
-@media (max-width: 768px) {
-  .info-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  .value {
-    max-width: 100%;
-    text-align: left;
-  }
+.page-header {
+  margin-bottom: 24px;
+  padding-left: 12px;
 }
 </style>

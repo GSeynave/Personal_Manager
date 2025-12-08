@@ -1,8 +1,8 @@
 package gse.home.personalmanager.security;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import gse.home.personalmanager.shared.exception.FirebaseAuthException;
-import gse.home.personalmanager.shared.utils.JwtUtils;
+import gse.home.personalmanager.core.exception.FirebaseAuthException;
+import gse.home.personalmanager.core.utils.JwtUtils;
 import gse.home.personalmanager.user.application.service.UserAuthService;
 import gse.home.personalmanager.user.domain.model.AppUser;
 import gse.home.personalmanager.user.domain.model.AppUserPrincipal;

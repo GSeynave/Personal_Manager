@@ -1,6 +1,6 @@
 package gse.home.personalmanager.todo.application;
 
-import gse.home.personalmanager.shared.test.BaseControllerTest;
+import gse.home.personalmanager.core.test.BaseControllerTest;
 import gse.home.personalmanager.todo.application.dto.TodoDTO;
 import gse.home.personalmanager.todo.application.dto.TodosViewDTO;
 import gse.home.personalmanager.todo.application.service.TodoUseCaseService;
@@ -13,7 +13,8 @@ import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

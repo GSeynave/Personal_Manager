@@ -2,6 +2,7 @@
 import { moduleColor, hexToRgbStr, moduleTintAlpha } from '@/config/moduleColors'
 import TodoList from '../components/todo/TodoList.vue'
 import TodoForm from '../components/todo/TodoForm.vue'
+import { CheckSquare } from 'lucide-vue-next'
 </script>
 
 <template>
@@ -11,41 +12,35 @@ import TodoForm from '../components/todo/TodoForm.vue'
       '--module-color-rgb': hexToRgbStr(moduleColor('todo')),
       '--module-tint-alpha': moduleTintAlpha(moduleColor('todo')),
     }"
+    class="p-6 min-h-screen space-y-8"
   >
     <div class="page-header">
-      <h1 class="page-title">✓ Todo</h1>
-      <p class="page-subtitle">Manage your tasks and priorities</p>
+      <div class="flex items-center gap-3 mb-2">
+        <CheckSquare class="w-8 h-8 text-productivity" />
+
+        <h1 class="text-3xl font-bold text-foreground">Todo</h1>
+      </div>
+      <p class="text-sm text-productivity">Manage your tasks and priorities</p>
     </div>
+    
+    <div class="space-y-6 p-6">
+
     <TodoForm />
+    
     <TodoList />
+    </div>
   </main>
 </template>
 
 <style scoped>
 main {
   padding: var(--spacing-lg, 24px);
-  background: var(--bg);
+  position: relative;
   min-height: 100vh;
 }
 
 .page-header {
   margin-bottom: 24px;
   padding-left: 12px;
-}
-
-.page-title {
-  margin: 0 0 6px 0;
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--primary, #6a1b9a);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.page-subtitle {
-  margin: 0;
-  font-size: 0.95rem;
-  color: var(--secondary);
 }
 </style>

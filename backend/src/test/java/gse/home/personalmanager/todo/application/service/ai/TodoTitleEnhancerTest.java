@@ -1,6 +1,6 @@
 package gse.home.personalmanager.todo.application.service.ai;
 
-import gse.home.personalmanager.shared.application.service.ai.AIAgentService;
+import gse.home.personalmanager.core.application.service.ai.AIAgentService;
 import gse.home.personalmanager.unit.UnitTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,6 @@ import org.mockito.Mock;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.*;
 
 class TodoTitleEnhancerTest extends UnitTestBase {
@@ -50,10 +49,10 @@ class TodoTitleEnhancerTest extends UnitTestBase {
         todoTitleEnhancer.getEnhancedTitle(testTitle);
 
         // Assert
-        verify(aiAgentService).generateResponse(argThat(prompt -> 
-            prompt.contains("todo") && 
-            prompt.contains("enhance") && 
-            prompt.contains("title")
+        verify(aiAgentService).generateResponse(argThat(prompt ->
+                prompt.contains("todo") &&
+                        prompt.contains("enhance") &&
+                        prompt.contains("title")
         ));
     }
 
@@ -130,8 +129,8 @@ class TodoTitleEnhancerTest extends UnitTestBase {
                 .thenThrow(new RuntimeException("AI service error"));
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> 
-            todoTitleEnhancer.getEnhancedTitle(testTitle)
+        assertThrows(RuntimeException.class, () ->
+                todoTitleEnhancer.getEnhancedTitle(testTitle)
         );
         verify(aiAgentService).generateResponse(anyString());
     }

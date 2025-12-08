@@ -13,7 +13,8 @@ import TransactionSummary from '@/model/TransactionSummary'
 import AccountingImport from '@/components/accouting/AccountingImport.vue'
 import AccountingCategorize from '@/components/accouting/AccountingCategorize.vue'
 
-import { Tabs, TabList, TabPanel, TabPanels, Tab } from 'primevue'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+
 const accountingService = new AccountingService()
 
 interface DateParam {
@@ -85,25 +86,23 @@ onMounted(() => {
       '--module-tint-alpha': moduleTintAlpha(moduleColor('accounting')),
     }"
   >
-    <Tabs value="0">
-      <TabList>
-        <Tab value="0">Report</Tab>
-        <Tab value="1">Import</Tab>
-        <Tab value="2">Categorize</Tab>
-      </TabList>
-      <TabPanels>
-        <TabPanel value="0">
-          <AccountingDateForm @onDateParamUpdate="onDateParamUpdate($event)" />
-          <AccountinngHeader :accounting-summary="accountingSummary" />
-          <AccountingList :transaction-summary="transactionSummary" />
-        </TabPanel>
-        <TabPanel value="1">
-          <AccountingImport />
-        </TabPanel>
-        <TabPanel value="2">
-          <AccountingCategorize />
-        </TabPanel>
-      </TabPanels>
+    <Tabs default-value="report" class="w-full">
+      <TabsList class="grid w-full grid-cols-3">
+        <TabsTrigger value="report">Report</TabsTrigger>
+        <TabsTrigger value="import">Import</TabsTrigger>
+        <TabsTrigger value="categorize">Categorize</TabsTrigger>
+      </TabsList>
+      <TabsContent value="report" class="space-y-4">
+        <AccountingDateForm @onDateParamUpdate="onDateParamUpdate($event)" />
+        <AccountinngHeader :accounting-summary="accountingSummary" />
+        <AccountingList :transaction-summary="transactionSummary" />
+      </TabsContent>
+      <TabsContent value="import">
+        <AccountingImport />
+      </TabsContent>
+      <TabsContent value="categorize">
+        <AccountingCategorize />
+      </TabsContent>
     </Tabs>
   </main>
 </template>

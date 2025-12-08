@@ -6,7 +6,9 @@ const API_URL = `/api/users`;
 export interface UserIdentity {
   userTag?: string;
   email?: string;
-  // Add other identity fields as needed
+  level?: number;
+  title?: string;
+  borderColor?: string;
 }
 
 export default class UserService {

@@ -1,15 +1,14 @@
 import { defineStore } from 'pinia'
 
-export type Theme = 'natural' | 'cosmic' | 'zen' | 'dark'
+export type Theme = 'light' | 'dark'
 
 export const useThemeStore = defineStore('theme', {
     state: () => ({
-        theme: (localStorage.getItem('pm_theme') as Theme) || 'natural',
+        theme: (localStorage.getItem('pm_theme') as Theme) || 'light',
     }),
     actions: {
         init() {
             // apply theme on startup
-            document.documentElement.setAttribute('data-theme', this.theme)
             if (this.theme === 'dark') {
                 document.documentElement.classList.add('dark')
             } else {
@@ -17,11 +16,8 @@ export const useThemeStore = defineStore('theme', {
             }
         },
         toggle() {
-            // Cycle through themes: natural -> cosmic -> zen -> dark -> natural
-            const themes: Theme[] = ['natural', 'cosmic', 'zen', 'dark']
-            const currentIndex = themes.indexOf(this.theme)
-            const nextIndex = (currentIndex + 1) % themes.length
-            this.theme = themes[nextIndex]!
+            // Toggle between light and dark
+            this.theme = this.theme === 'light' ? 'dark' : 'light'
             this.apply()
         },
         set(theme: Theme) {
@@ -30,7 +26,6 @@ export const useThemeStore = defineStore('theme', {
         },
         apply() {
             localStorage.setItem('pm_theme', this.theme)
-            document.documentElement.setAttribute('data-theme', this.theme)
             
             if (this.theme === 'dark') {
                 document.documentElement.classList.add('dark')

@@ -2,9 +2,10 @@
 import { onMounted, ref } from 'vue'
 import AccountingService from '@/services/AccountingService'
 import Transaction, { TransactionCategory, TransactionSubCategory } from '@/model/Transaction'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Select from 'primevue/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import CardContent from '../Dashboard/CardContent.vue'
 
 const accountingService = new AccountingService()
@@ -22,12 +23,6 @@ const categories = Object.values(TransactionCategory)
 const subCategories = Object.values(TransactionSubCategory)
   .filter((k) => isNaN(Number(k)))
   .map((subCat) => ({ label: subCat, value: subCat }))
-const editingRows = ref({})
-
-function onCellEditComplete(event: any) {
-  const { data, field, newValue } = event
-  data[field] = newValue
-}
 
 function updateToCategorize() {
   accountingService
@@ -46,56 +41,63 @@ function updateToCategorize() {
 
 <template>
   <CardContent :title="'Transaction to categorize'">
-    <div class="to-categorized-container" v-if="toCategorize">
-      <h3>Transactions to categorize</h3>
-      {{ categories }}
-      {{ subCategories }}
+    <div class="space-y-4" v-if="toCategorize && toCategorize.length > 0">
+      <h3 class="text-lg font-semibold">Transactions to categorize</h3>
 
-      <DataTable
-        v-model:editingRows="editingRows"
-        :value="toCategorize"
-        editMode="cell"
-        @cell-edit-complete="onCellEditComplete"
-      >
-        <Column field="date" header="Date" />
-        <Column field="description" header="Description" />
-        <Column field="amount" header="Amount" />
-        <!-- Editable CATEGORY column -->
-        <Column field="category" header="Category" editor>
-          <template #editor="{ data, field }">
-            <Select
-              v-model="data[field]"
-              :options="categories"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Select category"
-              class="w-full"
-            />
-          </template>
-        </Column>
-        <!-- Editable SUBCATEGORY column -->
-        <Column field="subCategory" header="Subcategory" editor>
-          <template #editor="{ data, field }">
-            <Select
-              v-model="data[field]"
-              :options="subCategories"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Select category"
-              class="w-full"
-            />
-          </template>
-        </Column>
-        <Column field="customCategory" header="Custom Category" editor>
-          <template #editor="{ data, field }">
-            <input type="text" v-model="data[field]" class="w-full" />
-          </template>
-        </Column>
-      </DataTable>
+      <div class="border rounded-md">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Date</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Amount</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Subcategory</TableHead>
+              <TableHead>Custom Category</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-for="(transaction, idx) in toCategorize" :key="idx">
+              <TableCell>{{ transaction.date }}</TableCell>
+              <TableCell>{{ transaction.description }}</TableCell>
+              <TableCell>{{ transaction.amount }}</TableCell>
+              <TableCell>
+                <Select v-model="transaction.category">
+                  <SelectTrigger class="w-[180px]">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="cat in categories" :key="cat.value" :value="cat.value">
+                      {{ cat.label }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell>
+                <Select v-model="transaction.subCategory">
+                  <SelectTrigger class="w-[180px]">
+                    <SelectValue placeholder="Select subcategory" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="subCat in subCategories" :key="subCat.value" :value="subCat.value">
+                      {{ subCat.label }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell>
+                <Input v-model="transaction.customCategory" type="text" class="w-full" />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
 
-      <button @click="updateToCategorize">Save Categories</button>
+      <Button @click="updateToCategorize" class="w-full">Save Categories</Button>
     </div>
-    <div v-else>None</div>
+    <div v-else class="text-center text-muted-foreground py-8">
+      <p>No transactions to categorize</p>
+    </div>
   </CardContent>
 </template>
 
