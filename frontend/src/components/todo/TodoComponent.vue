@@ -92,7 +92,7 @@ function getAssigneeImage(name: string | null) {
 <template>
   <div 
     :class="[
-      'bg-card',
+      'bg-card-item',
       'group relative flex items-center justify-between gap-4 p-4 border rounded-lg transition-all cursor-grab',
       'hover:shadow-md hover:border-primary hover:-translate-y-0.5',
       completed ? 'bg-muted/50 opacity-70 line-through' : 'bg-card',
@@ -106,16 +106,16 @@ function getAssigneeImage(name: string | null) {
     <Button
       variant="ghost"
       size="icon"
-      class="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity bg-primary hover:bg-primary/80"
+      class="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10"
       @click.stop="deleteTodo"
     >
-      <X class="h-4 w-4" />
+      <X class="w-4 h-4 text-destructive" />
     </Button>
 
     <div class="flex items-center gap-3 flex-1 min-w-0">
       <div class="flex-shrink-0">
-        <CircleCheck v-if="completed" class="h-5 w-5 text-green-600" />
-        <Circle v-else class="h-5 w-5 text-productivity" />
+        <CircleCheck v-if="completed" class="w-5 h-5 text-green-600" />
+        <Circle v-else class="w-5 h-5 text-productivity" />
       </div>
       
       <span class="font-medium text-foreground truncate">

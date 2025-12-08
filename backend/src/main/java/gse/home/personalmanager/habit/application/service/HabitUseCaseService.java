@@ -4,8 +4,7 @@ import gse.home.personalmanager.habit.application.dto.HabitDTO;
 import gse.home.personalmanager.habit.application.mapper.HabitMapper;
 import gse.home.personalmanager.habit.domain.service.HabitService;
 import gse.home.personalmanager.habit.infrastructure.repository.HabitRepository;
-import gse.home.personalmanager.user.domain.model.AppUser;
-import jakarta.persistence.EntityManager;
+import gse.home.personalmanager.user.infrastructure.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class HabitUseCaseService {
-    private final EntityManager entityManager;
+    private final UserRepository userRepository;
     private final HabitRepository habitRepository;
     private final HabitMapper habitMapper;
     private final HabitService habitService;
@@ -49,13 +48,18 @@ public class HabitUseCaseService {
     public Long createHabit(final Long userId, final HabitDTO habitDTO) {
         log.info("UseCaseService: Creating a new habit for user id: {}.", userId);
 
+
         // Step 1: Prepare
-        var userRef = getUserReference(userId);
+        var userRef = userRepository.getReferenceById(userId);
 
-        // Step 2: Create entity
-        var habitEntity = habitService.createHabitEntity(habitDTO, userRef);
+        // Step 2: Create an entity
+        var habitEntity = habitMapper.toEntity(habitDTO);
+        habitEntity.setUser(userRef);
 
-        // Step 3: persist
+        // Step 3: Validation
+        habitService.validateHabitConsistency(habitEntity);
+
+        // Step 4: persist
         return habitRepository.save(habitEntity).getId();
     }
 
@@ -71,10 +75,22 @@ public class HabitUseCaseService {
         log.info("UseCaseService: Updating the habit id: {}, and UserId : {}", id, userId);
 
         // Step 1: find entity or throw exception
-        var entity = habitService.findEntityOrThrow(userId, id);
+        var entity = habitRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> {
+                    log.error("Habit with id: {} not found for user: {}, cannot proceed", id, userId);
+                    return new RuntimeException("Habit not found");
+                });
 
         // Step 2: update entity
-        entity.updateDetails(habitDTO.getTitle(), habitDTO.getDescription());
+        entity.updateDetails(
+                habitDTO.getTitle(),
+                habitDTO.getDescription(),
+                habitDTO.getCategory(),
+                habitDTO.getFrequency(),
+                habitDTO.getScheduledDays(),
+                habitDTO.getNumberOfTimes(),
+                habitDTO.getDuration()
+        );
 
         // Step 3: persist
         habitRepository.save(entity);
@@ -90,15 +106,5 @@ public class HabitUseCaseService {
     public void deleteHabit(final Long userId, final Long id) {
         log.info("UseCaseService: Deleting the habit id: {} for user: {}", id, userId);
         habitRepository.deleteByIdAndUserId(id, userId);
-    }
-
-    /**
-     * Gets a reference to the user entity without loading it from the database.
-     *
-     * @param userId the ID of the user
-     * @return a reference to the {@code AppUser} entity
-     */
-    public AppUser getUserReference(final Long userId) {
-        return entityManager.getReference(AppUser.class, userId);
     }
 }

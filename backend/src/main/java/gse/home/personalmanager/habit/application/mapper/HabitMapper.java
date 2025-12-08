@@ -8,16 +8,17 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface HabitMapper {
 
-    @Mapping(target = "createdAt", source = "created_at")
-    @Mapping(target = "lastModified", source = "last_modified")
+    @Mapping(source = "type", target = "habitType")
+    @Mapping(source = "createAt", target = "createdAt")
     HabitDTO toDto(Habit habit);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "created_at", source = "createdAt")
-    @Mapping(target = "last_modified", source = "lastModified")
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "logs", ignore = true)
     @Mapping(target = "version", ignore = true)
+    @Mapping(target = "createAt", ignore = true)
+    @Mapping(target = "lastModified", ignore = true)
+    @Mapping(source = "habitType", target = "type")
     Habit toEntity(HabitDTO dto);
 
 }

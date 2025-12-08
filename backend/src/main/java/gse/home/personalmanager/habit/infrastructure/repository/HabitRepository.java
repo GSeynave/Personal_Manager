@@ -14,4 +14,6 @@ public interface HabitRepository extends JpaRepository<Habit, Long> {
     void deleteByIdAndUserId(Long id, Long userId);
 
     Optional<Habit> findByIdAndUserId(Long id, Long userId);
+
+    boolean existsByIdAndUserId(Long habitId, Long userId);
 }

@@ -11,6 +11,7 @@ import { Repeat } from 'lucide-vue-next'
       '--module-color-rgb': hexToRgbStr(moduleColor('habits')),
       '--module-tint-alpha': moduleTintAlpha(moduleColor('habits')),
     }"
+    class="p-6 min-h-screen space-y-8"
   >
     <div class="page-header">
       <div class="flex items-center gap-3 mb-2">
@@ -20,7 +21,9 @@ import { Repeat } from 'lucide-vue-next'
       </div>
       <p class="text-sm text-health">Track your habit streaks and progress</p>
     </div>
+    <div class="space-y-6 p-6">
     <HabitsList/>
+    </div>
   </main>
 </template>
 
@@ -31,33 +34,8 @@ main {
   min-height: 100vh;
 }
 
-main::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 6px;
-  border-radius: 4px 0 0 4px;
-}
-
 .page-header {
   margin-bottom: 24px;
   padding-left: 12px;
-}
-
-.page-title {
-  margin: 0 0 6px 0;
-  font-size: 2rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.page-subtitle {
-  margin: 0;
-  font-size: 0.95rem;
-  color: var(--text-secondary);
 }
 </style>

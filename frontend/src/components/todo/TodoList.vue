@@ -2,8 +2,10 @@
 import { onMounted, ref, computed } from 'vue'
 import { useTodoStore } from '@/stores/todo'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Infinity, Plus, X, CircleCheck, Circle } from 'lucide-vue-next'
 import TodoComponent from './TodoComponent.vue'
+import Card from '../ui/card/Card.vue'
 
 const todoStore = useTodoStore()
 const showGroupForm = ref(false)
@@ -13,6 +15,7 @@ const draggedTodoId = ref<number | null>(null)
 const draggedTodoSourceGroupId = ref<number | null | undefined>(undefined)
 const dropTargetGroupId = ref<number | null>(null)
 const activeGroupId = ref<number | null>(null)
+
 
 const activeGroup = computed(() => {
   if (activeGroupId.value === null) {
@@ -121,8 +124,8 @@ function handleDragEnd() {
     <p v-if="todoStore.isLoading" class="text-muted-foreground text-center py-4">Loading todos...</p>
     <p v-else-if="todoStore.error" class="text-destructive text-center py-4">{{ todoStore.error }}</p>
     
-    <div v-else class="flex gap-3 min-h-[500px] bg-background">
-      <div class="w-64 flex-shrink-0 flex flex-col bg-card backdrop-blur-sm rounded-xl p-3 shadow-md">
+    <div v-else class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <Card class="lg:col-span-1 bg-card backdrop-blur-sm rounded-xl p-4 shadow-md">
         <div class="flex flex-row gap-2 mb-4">
           <Button 
             variant="ghost"
@@ -130,7 +133,7 @@ function handleDragEnd() {
             :class="todoStore.filter === 'all' ? 'bg-primary/15 text-primary font-semibold' : 'hover:bg-background/60'"
             @click="todoStore.filter = 'all'"
           >
-            <Infinity/> ({{ todoStore.totalCount }})
+            <Infinity class="w-4 h-4 text-muted-foreground" /> ({{ todoStore.totalCount }})
           </Button>
           <Button 
             variant="ghost"
@@ -138,7 +141,7 @@ function handleDragEnd() {
             :class="todoStore.filter === 'active' ? 'bg-primary/15 text-productivity font-semibold' : 'hover:bg-background/60 text-productivity'"
             @click="todoStore.filter = 'active'"
           >
-            <Circle/> ({{ todoStore.activeCount }})
+            <Circle class="w-4 h-4" /> ({{ todoStore.activeCount }})
           </Button>
           <Button 
             variant="ghost"
@@ -146,10 +149,11 @@ function handleDragEnd() {
             :class="todoStore.filter === 'completed' ? 'bg-primary/15 text-green-600 font-semibold' : 'hover:bg-background/60 text-green-600'"
             @click="todoStore.filter = 'completed'"
           >
-            <CircleCheck/> ({{ todoStore.completedCount }})
+            <CircleCheck class="w-4 h-4" /> ({{ todoStore.completedCount }})
           </Button>
         </div>
         
+          <div class="h-px bg-border/50 my-2"></div>
         <div class="flex-1 overflow-y-auto flex flex-col gap-1">
           <div 
             class="px-4 py-3 cursor-pointer transition-all rounded-lg flex items-center justify-between"
@@ -162,7 +166,7 @@ function handleDragEnd() {
             @dragleave="handleDragLeave($event, null)"
             @drop="handleDrop($event, null)"
           >
-            <span>Ungrouped</span>
+            <span class="text-sm font-medium">Uncategorized</span>
             <span class="bg-background/80 px-2 py-0.5 rounded-full text-xs font-bold">
               <span :class="todoStore.ungroupedTodos.filter(t => t.completed).length === todoStore.ungroupedTodos.length ? 'text-green-600' : 'text-productivity'">{{ todoStore.ungroupedTodos.filter(t => t.completed).length }}</span>
               <span class="text-foreground/50"> / </span>
@@ -185,7 +189,7 @@ function handleDragEnd() {
             @dragleave="handleDragLeave($event, group.id)"
             @drop="handleDrop($event, group.id)"
           >
-            <span>{{ group.title }}</span>
+            <span class="text-sm font-medium">{{ group.title }}</span>
             <div class="flex items-center gap-2">
               <span class="bg-background/80 px-2 py-0.5 rounded-full text-xs font-bold">
                 <span :class="getGroupCompletedCount(group.id) === getGroupCount(group.id) ? 'text-green-600' : 'text-productivity'">{{ getGroupCompletedCount(group.id) }}</span>
@@ -200,7 +204,7 @@ function handleDragEnd() {
                 :title="'Delete group'"
                 @click.stop="todoStore.deleteGroup(group.id)"
               >
-                <X class="h-4 w-4" />
+                <X class="w-4 h-4 text-destructive" />
               </Button>
             </div>
           </div>
@@ -212,29 +216,32 @@ function handleDragEnd() {
             class="mx-0 mb-2 border-dashed border-border/50 bg-background/60 hover:bg-background/80"
             @click="showGroupForm = !showGroupForm"
           >
-            <Plus class="h-4 w-4 mr-2" />
+            <Plus class="w-4 h-4 mr-2 text-productivity" />
             {{ showGroupForm ? 'Cancel' : 'New Group' }}
           </Button>
           
           <div v-if="showGroupForm" class="flex flex-col gap-2 p-3 bg-background/80 rounded-lg">
-            <input 
+            <Input 
               v-model="newGroupTitle" 
               placeholder="Group title" 
-              class="px-3 py-2 border-0 rounded-md bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              class="h-9 text-sm"
               @keyup.enter="handleCreateGroup"
             />
-            <input 
+            <Input 
               v-model="newGroupDescription" 
               placeholder="Description (optional)" 
-              class="px-3 py-2 border-0 rounded-md bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              class="h-9 text-sm"
               @keyup.enter="handleCreateGroup"
             />
-            <Button size="sm" @click="handleCreateGroup">Create</Button>
+            <Button size="sm" @click="handleCreateGroup">
+              <Plus class="w-4 h-4 mr-2" />
+              Create
+            </Button>
           </div>
         </div>
-      </div>
+      </Card>
       
-      <div class="flex-1 p-6 overflow-y-auto bg-card backdrop-blur-sm rounded-xl shadow-md">
+      <Card class="lg:col-span-3 p-6 overflow-y-auto bg-card backdrop-blur-sm rounded-xl shadow-md">
         <div v-if="activeTodos.length > 0" class="flex flex-col gap-3">
           <TodoComponent
             v-for="todo in activeTodos"
@@ -254,7 +261,7 @@ function handleDragEnd() {
         <div v-else class="flex items-center justify-center h-full">
           <p class="text-muted-foreground italic text-lg">No todos in this group</p>
         </div>
-      </div>
+      </Card>
     </div>
 </template>
 

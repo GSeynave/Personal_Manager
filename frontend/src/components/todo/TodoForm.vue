@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { CirclePlus, X } from 'lucide-vue-next'
+import Card from '../ui/card/Card.vue'
 
 const todoStore = useTodoStore()
 const authStore = useAuthStore()
@@ -61,14 +62,14 @@ async function createTodo() {
     <Button 
       v-if="!isFormOpen"
       @click="toggleForm"
-      class="bg-primary hover:bg-primary/80 text-white"
+      class="bg-primary hover:bg-primary/80"
     >
-      <CirclePlus class="w-4 h-4 mr-2" />
-      Create New Todo
+      <CirclePlus class="w-4 h-4 mr-2 text-productivity" />
+      Create Todo
     </Button>
 
     <!-- Form -->
-    <div v-else class="bg-card backdrop-blur-sm rounded-xl p-4 shadow-md">
+    <Card v-else class="bg-card backdrop-blur-sm rounded-xl p-4 shadow-md">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-sm font-semibold text-foreground">Create Todo</h3>
         <Button 
@@ -81,32 +82,32 @@ async function createTodo() {
         </Button>
       </div>
 
-      <form @submit.prevent="createTodo" class="space-y-3">
-        <div class="space-y-1">
-          <Label for="title" class="text-xs font-medium text-muted-foreground">Title</Label>
+      <form @submit.prevent="createTodo" class="space-y-4">
+        <div class="space-y-2">
+          <Label for="title">Title</Label>
           <Input 
             id="title" 
             v-model="title" 
             placeholder="What needs to be done?" 
             required
-            class="border-0 bg-background focus-visible:ring-1 text-sm h-9"
+            class="h-9"
           />
         </div>
         
-        <div class="space-y-1">
-          <Label for="dueDate" class="text-xs font-medium text-muted-foreground">Due Date</Label>
+        <div class="space-y-2">
+          <Label for="dueDate">Due Date</Label>
           <Input 
             id="dueDate" 
             type="date" 
             v-model="dueDate" 
-            class="border-0 bg-background focus-visible:ring-1 text-sm h-9"
+            class="h-9"
           />
         </div>
         
-        <div class="space-y-1">
-          <Label for="group" class="text-xs font-medium text-muted-foreground">Group</Label>
+        <div class="space-y-2">
+          <Label for="group">Group</Label>
           <Select v-model="selectedGroupId">
-            <SelectTrigger id="group" class="border-0 bg-background h-9 text-sm">
+            <SelectTrigger id="group" class="h-9">
               <SelectValue placeholder="Select group" />
             </SelectTrigger>
             <SelectContent>
@@ -122,13 +123,12 @@ async function createTodo() {
           </Select>
         </div>
         
-        <Button type="submit" :disabled="todoStore.isLoading" 
-        class="w-full bg-primary hover:bg-primary/70 h-9 text-sm">
-          <CirclePlus class="w-3 h-3 mr-2" />
+        <Button type="submit" :disabled="todoStore.isLoading" class="w-full">
+          <CirclePlus class="w-4 h-4 mr-2" />
           {{ todoStore.isLoading ? 'Creating...' : 'Add' }}
         </Button>
       </form>
-    </div>
+    </Card>
   </div>
 </template>
 
