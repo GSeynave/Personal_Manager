@@ -1,4 +1,4 @@
-package gse.home.personalmanager.config;
+package gse.home.personalmanager.core.config.websocket;
 
 import gse.home.personalmanager.user.application.service.UserAuthService;
 import gse.home.personalmanager.user.domain.model.AppUser;
@@ -11,7 +11,6 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.security.Principal;
@@ -27,24 +26,24 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-        
+
         if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
             // Extract user ID from the connect headers
             List<String> userIdHeaders = accessor.getNativeHeader("userId");
-            
+
             if (userIdHeaders != null && !userIdHeaders.isEmpty()) {
                 String firebaseUid = userIdHeaders.get(0);
                 log.info("WebSocket CONNECT from Firebase UID: {}", firebaseUid);
-                
+
                 // Look up or create the user by Firebase UID
                 // Note: We don't have email in WebSocket headers, but UserAuthService will handle null email
                 AppUser user = userAuthService.findOrCreateByFirebaseUid(firebaseUid, null);
-                
+
                 if (user != null) {
                     // Create a principal with the database user ID
                     Principal principal = new UsernamePasswordAuthenticationToken(
-                            user.getId().toString(), 
-                            null, 
+                            user.getId().toString(),
+                            null,
                             List.of()
                     );
                     accessor.setUser(principal);
@@ -57,7 +56,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 log.warn("No userId header in WebSocket CONNECT");
             }
         }
-        
+
         return message;
     }
 }

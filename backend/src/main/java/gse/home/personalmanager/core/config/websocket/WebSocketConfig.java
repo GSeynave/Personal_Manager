@@ -1,4 +1,4 @@
-package gse.home.personalmanager.config;
+package gse.home.personalmanager.core.config.websocket;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;

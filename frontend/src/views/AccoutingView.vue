@@ -14,6 +14,7 @@ import AccountingImport from '@/components/accouting/AccountingImport.vue'
 import AccountingCategorize from '@/components/accouting/AccountingCategorize.vue'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Wallet } from 'lucide-vue-next'
 
 const accountingService = new AccountingService()
 
@@ -85,60 +86,48 @@ onMounted(() => {
       '--module-color-rgb': hexToRgbStr(moduleColor('accounting')),
       '--module-tint-alpha': moduleTintAlpha(moduleColor('accounting')),
     }"
+    class="p-6 min-h-screen space-y-8"
   >
-    <Tabs default-value="report" class="w-full">
-      <TabsList class="grid w-full grid-cols-3">
-        <TabsTrigger value="report">Report</TabsTrigger>
-        <TabsTrigger value="import">Import</TabsTrigger>
-        <TabsTrigger value="categorize">Categorize</TabsTrigger>
-      </TabsList>
-      <TabsContent value="report" class="space-y-4">
-        <AccountingDateForm @onDateParamUpdate="onDateParamUpdate($event)" />
-        <AccountinngHeader :accounting-summary="accountingSummary" />
-        <AccountingList :transaction-summary="transactionSummary" />
-      </TabsContent>
-      <TabsContent value="import">
-        <AccountingImport />
-      </TabsContent>
-      <TabsContent value="categorize">
-        <AccountingCategorize />
-      </TabsContent>
-    </Tabs>
+    <div class="page-header">
+      <div class="flex items-center gap-3 mb-2">
+        <Wallet class="w-8 h-8 text-accounting" />
+        <h1 class="text-3xl font-bold text-foreground">Finance & Resources</h1>
+      </div>
+      <p class="text-sm text-accounting">Manage your transactions and budget</p>
+    </div>
+
+    <div class="space-y-6 p-6">
+      <Tabs default-value="report" class="w-full">
+        <TabsList class="grid w-full grid-cols-3">
+          <TabsTrigger value="report">Report</TabsTrigger>
+          <TabsTrigger value="import">Import</TabsTrigger>
+          <TabsTrigger value="categorize">Categorize</TabsTrigger>
+        </TabsList>
+        <TabsContent value="report" class="space-y-4">
+          <AccountingDateForm @onDateParamUpdate="onDateParamUpdate($event)" />
+          <AccountinngHeader :accounting-summary="accountingSummary" />
+          <AccountingList :transaction-summary="transactionSummary" />
+        </TabsContent>
+        <TabsContent value="import">
+          <AccountingImport />
+        </TabsContent>
+        <TabsContent value="categorize">
+          <AccountingCategorize />
+        </TabsContent>
+      </Tabs>
+    </div>
   </main>
 </template>
 
 <style scoped>
 main {
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
+  padding: var(--spacing-lg, 24px);
   position: relative;
-  background: linear-gradient(
-    90deg,
-    rgba(var(--module-color-rgb, 46, 125, 50), var(--module-tint-alpha, 0.04)),
-    rgba(255, 255, 255, 0)
-  );
+  min-height: 100vh;
 }
 
-/* subtle left accent to visually connect with the dashboard cards */
-main::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 6px;
-  background: var(--module-color, #2e7d32);
-  border-radius: 4px 0 0 4px;
-}
-
-/* Make the Tabs header use module color for active tab */
-.p-tabview .p-tabview-nav .p-highlight {
-  background: linear-gradient(
-    90deg,
-    rgba(var(--module-color-rgb, 46, 125, 50), 0.12),
-    rgba(var(--module-color-rgb, 46, 125, 50), 0.06)
-  );
-  border-color: rgba(var(--module-color-rgb, 46, 125, 50), 0.16) !important;
-  color: var(--module-color) !important;
+.page-header {
+  margin-bottom: 24px;
+  padding-left: 12px;
 }
 </style>

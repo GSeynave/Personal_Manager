@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static gse.home.personalmanager.core.utils.UserUtils.getUserId;
+
 @Slf4j
 @RestController
 @RequestMapping("v1/habits/{habitId}/logs")
@@ -18,10 +20,6 @@ import java.util.List;
 public class HabitLogController {
 
     HabitLogUseCaseService useCaseService;
-
-    private static Long getUserId(AppUserPrincipal userPrincipal) {
-        return userPrincipal.getUser().getId();
-    }
 
     @GetMapping
     public ResponseEntity<List<HabitLogDTO>> getHabitLogs(

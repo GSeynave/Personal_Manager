@@ -5,10 +5,10 @@ import gse.home.personalmanager.habit.application.mapper.HabitMapper;
 import gse.home.personalmanager.habit.domain.service.HabitService;
 import gse.home.personalmanager.habit.infrastructure.repository.HabitRepository;
 import gse.home.personalmanager.user.infrastructure.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,10 +28,11 @@ public class HabitUseCaseService {
      * @param userId the ID of the user whose habits are to be retrieved
      * @return a list of {@code HabitDTO} containing all habits for the user
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public List<HabitDTO> getAllHabits(final Long userId) {
         log.info("UseCaseService: Getting all habits for user id: {}.", userId);
         var habits = habitRepository.findAllByUserId(userId);
+
         return habits.stream()
                 .map(habitMapper::toDto)
                 .collect(Collectors.toList());
@@ -40,8 +41,7 @@ public class HabitUseCaseService {
     /**
      * Creates a new habit for a specified user.
      *
-     * @param userId   the ID of the user for whom the habit is being created
-     * @param habitDTO the {@code HabitDTO} object containing the details of the habit to be created
+     * @param userId the ID of the user for whom the habit is being created * @param habitDTO the {@code HabitDTO} object containing the details of the habit to be created
      * @return the ID of the newly created habit
      */
     @Transactional
@@ -82,15 +82,7 @@ public class HabitUseCaseService {
                 });
 
         // Step 2: update entity
-        entity.updateDetails(
-                habitDTO.getTitle(),
-                habitDTO.getDescription(),
-                habitDTO.getCategory(),
-                habitDTO.getFrequency(),
-                habitDTO.getScheduledDays(),
-                habitDTO.getNumberOfTimes(),
-                habitDTO.getDuration()
-        );
+        habitMapper.updateEntityFromDto(habitDTO, entity);
 
         // Step 3: persist
         habitRepository.save(entity);

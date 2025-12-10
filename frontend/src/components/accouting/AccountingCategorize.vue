@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import CardContent from '../Dashboard/CardContent.vue'
+import { Tags, Save } from 'lucide-vue-next'
 
 const accountingService = new AccountingService()
 const toCategorize = ref<Transaction[]>([])
@@ -40,9 +41,14 @@ function updateToCategorize() {
 </script>
 
 <template>
-  <CardContent :title="'Transaction to categorize'">
-    <div class="space-y-4" v-if="toCategorize && toCategorize.length > 0">
-      <h3 class="text-lg font-semibold">Transactions to categorize</h3>
+  <div class="space-y-4">
+    <div class="flex items-center gap-3 mb-4">
+      <Tags class="w-6 h-6 text-accounting" />
+      <h2 class="text-xl font-semibold text-foreground">Categorize Transactions</h2>
+    </div>
+
+    <CardContent v-if="toCategorize && toCategorize.length > 0">
+      <div class="space-y-4">
 
       <div class="border rounded-md">
         <Table>
@@ -93,12 +99,19 @@ function updateToCategorize() {
         </Table>
       </div>
 
-      <Button @click="updateToCategorize" class="w-full">Save Categories</Button>
-    </div>
-    <div v-else class="text-center text-muted-foreground py-8">
-      <p>No transactions to categorize</p>
-    </div>
-  </CardContent>
+        <Button @click="updateToCategorize" class="w-full">
+          <Save class="w-4 h-4 mr-2 text-accounting" />
+          Save Categories
+        </Button>
+      </div>
+    </CardContent>
+    
+    <CardContent v-else>
+      <div class="text-center text-muted-foreground py-8">
+        <p>No transactions to categorize</p>
+      </div>
+    </CardContent>
+  </div>
 </template>
 
 <style scoped></style>

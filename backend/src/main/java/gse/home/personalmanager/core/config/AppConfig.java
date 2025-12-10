@@ -6,8 +6,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @Configuration
+@EnableAsync
 @EnableFeignClients(basePackages = "gse.home.personalmanager")
 @EnableJpaRepositories(basePackages = {
         "gse.home.personalmanager.todo.infrastructure.repository",

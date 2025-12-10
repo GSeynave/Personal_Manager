@@ -1,5 +1,6 @@
 package gse.home.personalmanager.config;
 
+import gse.home.personalmanager.core.config.websocket.WebSocketAuthInterceptor;
 import gse.home.personalmanager.user.application.service.UserAuthService;
 import gse.home.personalmanager.user.domain.model.AppUser;
 import org.junit.jupiter.api.Test;
@@ -35,11 +36,11 @@ class WebSocketAuthInterceptorTest {
         // Given
         String firebaseUid = "firebase-uid-123";
         Long userId = 1L;
-        
+
         AppUser user = new AppUser();
         user.setId(userId);
         user.setFirebaseUid(firebaseUid);
-        
+
         when(userAuthService.findOrCreateByFirebaseUid(eq(firebaseUid), any())).thenReturn(user);
 
         StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.CONNECT);
@@ -87,11 +88,11 @@ class WebSocketAuthInterceptorTest {
     void shouldHandleUserNotFound() {
         // Given
         String firebaseUid = "firebase-uid-456";
-        
+
         StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.CONNECT);
         accessor.setNativeHeader("userId", firebaseUid);
         Message<?> message = MessageBuilder.createMessage("", accessor.getMessageHeaders());
-        
+
         when(userAuthService.findOrCreateByFirebaseUid(eq(firebaseUid), any())).thenReturn(null);
 
         // When
