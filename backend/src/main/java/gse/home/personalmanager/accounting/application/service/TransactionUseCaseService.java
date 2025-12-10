@@ -1,15 +1,13 @@
 package gse.home.personalmanager.accounting.application.service;
 
-import gse.home.personalmanager.accounting.application.dto.AccountingSummaryDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionCSVRowDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionSummaryDTO;
+import gse.home.personalmanager.accounting.application.dto.*;
 import gse.home.personalmanager.accounting.application.mapper.TransactionMapper;
 import gse.home.personalmanager.accounting.domain.model.TransactionCategory;
 import gse.home.personalmanager.accounting.domain.service.TransactionService;
 import gse.home.personalmanager.accounting.infrastructure.repository.TransactionRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -50,6 +48,7 @@ public class TransactionUseCaseService {
         // Implementation to retrieve transaction summary between minDate and maxDate
 
         // Apply a cache of a few minutes to avoid hitting the database too often
+        var page = Pageable.ofSize(10);
         var transactions = repository.findAllByDateBetween(minDate, maxDate);
         return transactionService.getTransactionSummary(transactions);
     }
@@ -72,12 +71,18 @@ public class TransactionUseCaseService {
         return totalSaved.get();
     }
 
-    public List<TransactionDTO> getUncategorizedTransactions() {
-        var transactions = repository.findAllByCategory(TransactionCategory.NONE);
+    public UncategorizedTransactionDTO getUncategorizedTransactions() {
+        var transactions = repository.findAllByCategory(TransactionCategory.NONE, Pageable.ofSize(10));
         if (transactions.isEmpty()) {
             return null;
         }
-        return transactions.stream().map(mapper::toDto).toList();
+        var transactionDtos = transactions.stream().map(mapper::toDto).toList();
+
+        return UncategorizedTransactionDTO.builder()
+                .page(transactions.getPageable().getPageNumber())
+                .totalElements(transactions.getNumberOfElements())
+                .totalPage(transactions.getTotalPages())
+                .build();
     }
 
     public void updateTransactionsToCategorize(List<TransactionDTO> transactionDTOS) {

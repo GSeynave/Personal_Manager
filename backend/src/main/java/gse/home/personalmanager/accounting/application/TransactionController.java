@@ -1,12 +1,10 @@
 package gse.home.personalmanager.accounting.application;
 
-import gse.home.personalmanager.accounting.application.dto.AccountingSummaryDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionCSVRowDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionSummaryDTO;
+import gse.home.personalmanager.accounting.application.dto.*;
 import gse.home.personalmanager.accounting.application.service.TransactionUseCaseService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +20,7 @@ public class TransactionController {
     TransactionUseCaseService useCaseService;
 
     @GetMapping
-    public ResponseEntity<List<TransactionSummaryDTO>> getTodos(@RequestParam LocalDate minDate,
+    public ResponseEntity<Page<TransactionSummaryDTO>> getTodos(@RequestParam LocalDate minDate,
                                                                 @RequestParam LocalDate maxDate) {
         log.info("Request to get all todos from {} to {}", minDate, maxDate);
         return ResponseEntity.ok(useCaseService.getAllTransactions(minDate, maxDate));
@@ -42,7 +40,7 @@ public class TransactionController {
     }
 
     @GetMapping("/to-categorize")
-    public ResponseEntity<List<TransactionDTO>> getUncategorizedTransactions() {
+    public ResponseEntity<UncategorizedTransactionDTO> getUncategorizedTransactions() {
         log.info("Request to get uncategorized transactions");
         return ResponseEntity.ok(useCaseService.getUncategorizedTransactions());
     }
