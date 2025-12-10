@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: personal-manager
+
+    # Default dev profile
+    profiles:
+      active: ${SPRING_PROFILES_ACTIVE:dev}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+
+firebase:
+  project-id: personal-manager-gse
+
+server:
+  forward-headers-strategy: native
+
+gamification:
+  essence:
+    task-completed: 20
+    habit-completed: 15
+    streak-7-days: 50
+    streak-30-days: 200
+    streak-100-days: 500
+  limits:
+    max-actions-per-hour: 20
+    max-essence-per-hour: 500
+    instant-completion-cooldown-minutes: 1
+  diminishing-returns:
+    enabled: true
