@@ -1,9 +1,6 @@
 package gse.home.personalmanager.accounting.application.service;
 
-import gse.home.personalmanager.accounting.application.dto.AccountingSummaryDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionCSVRowDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionSummaryDTO;
+import gse.home.personalmanager.accounting.application.dto.*;
 import gse.home.personalmanager.accounting.application.mapper.TransactionMapper;
 import gse.home.personalmanager.accounting.domain.model.Transaction;
 import gse.home.personalmanager.accounting.domain.model.TransactionCategory;
@@ -16,6 +13,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -194,27 +194,27 @@ class TransactionUseCaseServiceTest extends UnitTestBase {
     void getUncategorizedTransactions_shouldReturnUncategorizedTransactions() {
         // Arrange
         List<Transaction> transactions = List.of(createTransaction(1), createTransaction(2));
-        when(repository.findAllByCategory(TransactionCategory.NONE)).thenReturn(transactions);
+        when(repository.findAllByCategory(TransactionCategory.NONE, Pageable.ofSize(10))).thenReturn(new PageImpl<>(transactions, Pageable.ofSize(10), 10));
 
         // Act
-        List<TransactionDTO> result = transactionUseCaseService.getUncategorizedTransactions();
+        UncategorizedTransactionDTO result = transactionUseCaseService.getUncategorizedTransactions();
 
         // Assert
-        assertThat(result).hasSize(2);
-        verify(repository).findAllByCategory(TransactionCategory.NONE);
+        assertThat(result.getTransactions()).hasSize(2);
+        verify(repository).findAllByCategory(TransactionCategory.NONE, Pageable.ofSize(10));
         verify(mapper, times(2)).toDto(any(Transaction.class));
     }
 
     @Test
     void getUncategorizedTransactions_shouldReturnNull_whenNoUncategorizedTransactions() {
         // Arrange
-        when(repository.findAllByCategory(TransactionCategory.NONE)).thenReturn(Collections.emptyList());
+        when(repository.findAllByCategory(TransactionCategory.NONE, Pageable.ofSize(10))).thenReturn(Page.empty());
 
         // Act
-        List<TransactionDTO> result = transactionUseCaseService.getUncategorizedTransactions();
+        UncategorizedTransactionDTO result = transactionUseCaseService.getUncategorizedTransactions();
 
         // Assert
-        assertThat(result).isNull();
+        assertThat(result.getTransactions()).isNull();
     }
 
     @Test

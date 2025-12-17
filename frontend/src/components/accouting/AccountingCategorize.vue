@@ -8,9 +8,10 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import CardContent from '../Dashboard/CardContent.vue'
 import { Tags, Save } from 'lucide-vue-next'
+import type UncategorizedTransactions from '@/model/UncategorizedTransactions'
 
 const accountingService = new AccountingService()
-const toCategorize = ref<Transaction[]>([])
+const toCategorize = ref<UncategorizedTransactions>()
 
 onMounted(() => {
   accountingService.getTransactionsToCategorize().then((data) => {
@@ -27,7 +28,7 @@ const subCategories = Object.values(TransactionSubCategory)
 
 function updateToCategorize() {
   accountingService
-    .updateTransaction(toCategorize.value)
+    .updateTransaction(toCategorize.value?.transactions || [])
     .then(() => {
       console.log('Transactions updated successfully')
       accountingService.getTransactionsToCategorize().then((data) => {
@@ -38,6 +39,10 @@ function updateToCategorize() {
       console.error('Error updating transactions:', err)
     })
 }
+
+function isPositive(amount: number): boolean {
+  return amount >= 0
+}
 </script>
 
 <template>
@@ -47,7 +52,7 @@ function updateToCategorize() {
       <h2 class="text-xl font-semibold text-foreground">Categorize Transactions</h2>
     </div>
 
-    <CardContent v-if="toCategorize && toCategorize.length > 0">
+    <CardContent v-if="toCategorize && toCategorize.transactions.length > 0">
       <div class="space-y-4">
 
       <div class="border rounded-md">
@@ -63,10 +68,11 @@ function updateToCategorize() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-for="(transaction, idx) in toCategorize" :key="idx">
+            <!-- TODO turn this into a data table ? for pagination -->
+            <TableRow v-for="(transaction, idx) in toCategorize.transactions" :key="idx">
               <TableCell>{{ transaction.date }}</TableCell>
               <TableCell>{{ transaction.description }}</TableCell>
-              <TableCell>{{ transaction.amount }}</TableCell>
+              <TableCell :class="isPositive(transaction.amount) ? 'text-green-400' : 'text-red-400'">{{ transaction.amount }}</TableCell>
               <TableCell>
                 <Select v-model="transaction.category">
                   <SelectTrigger class="w-[180px]">

@@ -1,4 +1,6 @@
-export default class Transaction {
+import type Transaction from "./Transaction";
+
+export default class UncategorizedTransactions {
 
   transactions: Transaction[];
   page: number;

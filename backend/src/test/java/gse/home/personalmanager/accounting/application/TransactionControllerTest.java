@@ -1,9 +1,6 @@
 package gse.home.personalmanager.accounting.application;
 
-import gse.home.personalmanager.accounting.application.dto.AccountingSummaryDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionCSVRowDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionSummaryDTO;
+import gse.home.personalmanager.accounting.application.dto.*;
 import gse.home.personalmanager.accounting.application.service.TransactionUseCaseService;
 import gse.home.personalmanager.core.test.BaseControllerTest;
 import org.junit.jupiter.api.Test;
@@ -16,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -94,14 +90,14 @@ class TransactionControllerTest extends BaseControllerTest {
         // Arrange
         TransactionDTO dto = new TransactionDTO();
         dto.setId(1);
-        List<TransactionDTO> uncategorized = List.of(dto);
+        UncategorizedTransactionDTO uncategorized = UncategorizedTransactionDTO.builder().transactions(List.of(dto)).build();
         when(useCaseService.getUncategorizedTransactions()).thenReturn(uncategorized);
 
         // Act & Assert
         mockMvc.perform(get("/v1/transactions/to-categorize")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1));
+                .andExpect(jsonPath("$transactions[0].id").value(1));
 
         verify(useCaseService).getUncategorizedTransactions();
     }

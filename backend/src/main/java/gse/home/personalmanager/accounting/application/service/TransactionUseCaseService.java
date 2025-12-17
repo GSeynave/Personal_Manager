@@ -79,6 +79,7 @@ public class TransactionUseCaseService {
         var transactionDtos = transactions.stream().map(mapper::toDto).toList();
 
         return UncategorizedTransactionDTO.builder()
+                .transactions(transactionDtos)
                 .page(transactions.getPageable().getPageNumber())
                 .totalElements(transactions.getNumberOfElements())
                 .totalPage(transactions.getTotalPages())
