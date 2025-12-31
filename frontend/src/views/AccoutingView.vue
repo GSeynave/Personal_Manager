@@ -2,16 +2,16 @@
 import { onMounted, ref } from 'vue'
 import { moduleColor, hexToRgbStr, moduleTintAlpha } from '@/config/moduleColors'
 
-import AccountinngHeader from '@/components/accouting/AccountingHeader.vue'
-import AccountingList from '@/components/accouting/AccountingList.vue'
-import AccountingDateForm from '@/components/accouting/AccountingDateForm.vue'
+import AccountinngHeader from '@/components/accounting/AccountingHeader.vue'
+import AccountingList from '@/components/accounting/AccountingList.vue'
+import AccountingDateForm from '@/components/accounting/AccountingDateForm.vue'
 
 import AccountingService from '@/services/AccountingService'
 
 import AccountingSummary from '@/model/AccountingSummary'
 import TransactionSummary from '@/model/TransactionSummary'
-import AccountingImport from '@/components/accouting/AccountingImport.vue'
-import AccountingCategorize from '@/components/accouting/AccountingCategorize.vue'
+import AccountingImport from '@/components/accounting/AccountingImport.vue'
+import AccountingCategorize from '@/components/accounting/AccountingCategorize.vue'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Wallet } from 'lucide-vue-next'
@@ -80,14 +80,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <main
-    :style="{
-      '--module-color': moduleColor('accounting'),
-      '--module-color-rgb': hexToRgbStr(moduleColor('accounting')),
-      '--module-tint-alpha': moduleTintAlpha(moduleColor('accounting')),
-    }"
-    class="p-6 min-h-screen space-y-8"
-  >
+  <main :style="{
+    '--module-color': moduleColor('accounting'),
+    '--module-color-rgb': hexToRgbStr(moduleColor('accounting')),
+    '--module-tint-alpha': moduleTintAlpha(moduleColor('accounting')),
+  }" class="p-6 min-h-screen space-y-8">
     <div class="page-header">
       <div class="flex items-center gap-3 mb-2">
         <Wallet class="w-8 h-8 text-accounting" />

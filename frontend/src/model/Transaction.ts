@@ -1,53 +1,30 @@
+import type TransactionCategory from "./TransactionCategory";
+
 export default class Transaction {
 
   id: number;
-  description: string;
+  importLabel: string;
+  customLabel: string;
   amount: number;
   date: Date;
   category: TransactionCategory; //create enum Category { Income, Expense, Transfer }
-  subCategory: TransactionSubCategory;
   type: TransactionType;
-  customCategory: string;
+  relatedTransactionId: number;
+  accountId: number;
 
-  constructor(id: number, description: string, amount: number, date: Date, category: TransactionCategory = TransactionCategory.NONE,
-    subCategory: TransactionSubCategory = TransactionSubCategory.NONE, type: TransactionType = TransactionType.DEBIT,
-    customCategory: string = "") {
+  constructor(id: number, importLabel: string, customLabel: string, amount: number,
+    date: Date, category: TransactionCategory, type: TransactionType, relatedTransactionId: number,
+    accountId: number) {
     this.id = id;
-    this.description = description;
+    this.importLabel = importLabel;
+    this.customLabel = customLabel;
     this.amount = amount;
     this.date = date;
     this.category = category;
-    this.subCategory = subCategory;
     this.type = type;
-    this.customCategory = customCategory;
+    this.relatedTransactionId = relatedTransactionId;
+    this.accountId = accountId;
   }
-
-}
-
-export enum TransactionCategory {
-  NONE,
-  BILL,
-  DEBT,
-  SALARY,
-  INSURANCE,
-  SUBSCRIPTIONS,
-  HEALTH,
-  CAR,
-  GROSSERY,
-  SAVING,
-  HELP,
-  REFUND,
-  PET,
-  CHILDREN,
-  TRANSFER,
-  MISC
-}
-
-export enum TransactionSubCategory {
-  NONE,
-  HOUSE,
-  SCHOOL,
-  DAD
 }
 
 export enum TransactionType {

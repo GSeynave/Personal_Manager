@@ -19,6 +19,9 @@ function toggleCategory(category: string) {
 function isExpanded(category: string) {
   return expandedCategories.value.has(category)
 }
+function isPositive(amount: number): boolean {
+  return amount >= 0
+}
 </script>
 
 <template>
@@ -60,8 +63,8 @@ function isExpanded(category: string) {
                   </TableHeader>
                   <TableBody>
                     <TableRow v-for="(transaction, idx) in summary.transactions" :key="idx" class="bg-muted/30">
-                      <TableCell class="pl-16">{{ transaction.customCategory }}</TableCell>
-                      <TableCell>{{ transaction.amount }}</TableCell>
+                      <TableCell class="pl-16">{{ transaction.customCategory === '' ? transaction.description : transaction.customCategory }}</TableCell>
+                      <TableCell :class="isPositive(transaction.amount) ? 'text-green-400' : 'text-red-400'">{{ transaction.amount }}</TableCell>
                       <TableCell>{{ transaction.date }}</TableCell>
                     </TableRow>
                   </TableBody>

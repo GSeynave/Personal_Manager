@@ -3,6 +3,7 @@ import TransactionSummary from '@/model/TransactionSummary';
 import type AccountingSummary from '@/model/AccountingSummary';
 import type TransactionCsvRow from '@/model/TransactionCsvRow';
 import type Transaction from '@/model/Transaction';
+import type UncategorizedTransactions from '@/model/UncategorizedTransactions';
 
 const API_URL = `/api/transactions`;
 
@@ -22,9 +23,15 @@ export default class AccountingService {
     await axios.post(`${API_URL}/csv`, csvLines);
   }
 
-  async getTransactionsToCategorize(): Promise<Transaction[]> {
+  async getTransactionsToCategorize(): Promise<UncategorizedTransactions> {
     console.log("Fetching transactions to categorize...");
-    const response = await axios.get(`${API_URL}/to-categorize`);
+
+    const page = 0;
+    const size = 100; // You can adjust the size as needed
+
+    const params = new URLSearchParams({ page: page.toString(), size: size.toString() });
+    const response = await axios.get(`${API_URL}/to-categorize`, { params });
+    console.log("Transactions to categorize retrieved:", response.data);
     return response.data;
   }
 
