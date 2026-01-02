@@ -1,4 +1,4 @@
-# Auto-Categorization Module
+# Auto-Categorization
 
 ## Overview
 Allows users to define rules that automatically categorize imported transactions, reducing manual work and ensuring consistency. Rules support flexible matching patterns with actions that set category, subcategory, and custom labels.

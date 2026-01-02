@@ -3,12 +3,12 @@ package gse.home.personalmanager.accounting.application.service;
 import gse.home.personalmanager.accounting.application.dto.*;
 import gse.home.personalmanager.accounting.application.mapper.TransactionMapper;
 import gse.home.personalmanager.accounting.domain.service.TransactionService;
+import gse.home.personalmanager.accounting.domain.service.WalletService;
 import gse.home.personalmanager.accounting.infrastructure.repository.TransactionRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,46 +23,47 @@ public class TransactionUseCaseService {
   private final TransactionRepository repository;
   private final TransactionMapper mapper;
   private final TransactionService transactionService;
+  private final WalletService walletService;
 
   /**
    * Retrieves all transactions.
    * This is used to display them in the accounting overview screen.
-   * TODO: This will need to be filtered by date range in the future.
-   * TODO: This will need to be regrouped by categories in the future.
+   * Transactions are filtered by date range, wallet (optional), and user.
    * TODO: This will need to give balance information in the future.
    * TODO: This will need to give category maximums for budgeting in the future.
    * TODO: This will need to give percent of total per category in the future.
    */
-  public List<TransactionSummaryDTO> getAllTransactions(LocalDate minDate, LocalDate maxDate) {
-    // Simple log as a test
-
-    /*
-     * Retrieves all transactions from the repository,
-     * from a given "filter" criteria in the future.
-     * The filter will be date range at first (monthly view).
-     */
-    // to be implemented
+  public List<TransactionSummaryDTO> getAllTransactions(LocalDate minDate, LocalDate maxDate, Long walletId, Long userId) {
     // Apply a cache of a few minutes to avoid hitting the database too often
-    var transactions = repository.findAllByDateBetween(minDate, maxDate);
+    var transactions = getTransactionsByDateAndWallet(minDate, maxDate, walletId, userId);
     return transactionService.getTransactionCategoryDetails(transactions);
   }
 
-  public AccountingSummaryDTO getTransactionSummary(LocalDate minDate, LocalDate maxDate) {
+  public AccountingSummaryDTO getTransactionSummary(LocalDate minDate, LocalDate maxDate, Long walletId, Long userId) {
     // Implementation to retrieve transaction summary between minDate and maxDate
+    // filtered by wallet if provided
 
     // Apply a cache of a few minutes to avoid hitting the database too often
-    var page = Pageable.ofSize(10);
-    var transactions = repository.findAllByDateBetween(minDate, maxDate);
-    return transactionService.getTransactionSummary(transactions);
+    var transactions = getTransactionsByDateAndWallet(minDate, maxDate, walletId, userId);
+    
+    // Get current wallet balance
+    Double balance = walletId != null ? walletService.getCurrentBalance(walletId) : null;
+    
+    return transactionService.getTransactionSummary(transactions, balance);
   }
 
-  public Integer importCSVRows(List<TransactionCSVRowDTO> csvRowDTOList) {
+  private List<gse.home.personalmanager.accounting.domain.model.Transaction> getTransactionsByDateAndWallet(
+      LocalDate minDate, LocalDate maxDate, Long walletId, Long userId) {
+    return repository.findAllByDateBetweenAndWalletIdAndUserId(minDate, maxDate, walletId, userId);
+  }
+
+  public Integer importCSVRows(List<TransactionCSVRowDTO> csvRowDTOList, Long walletId, Long userId) {
     if (csvRowDTOList == null || csvRowDTOList.isEmpty()) {
       log.warn("No rows found in the CSV");
       return 0;
     }
 
-    var transactions = transactionService.fromCSVRowToTransactionList(csvRowDTOList);
+    var transactions = transactionService.fromCSVRowToTransactionList(csvRowDTOList, walletId, userId);
 
     AtomicReference<Integer> totalSaved = new AtomicReference<>(0);
     transactions.forEach(t -> {
@@ -80,8 +81,8 @@ public class TransactionUseCaseService {
     return totalSaved.get();
   }
 
-  public UncategorizedTransactionDTO getUncategorizedTransactions(int page, int size) {
-    var transactions = repository.findAllByCategoryIsNull(PageRequest.of(page, size));
+  public UncategorizedTransactionDTO getUncategorizedTransactions(Long walletId, Long userId, int page, int size) {
+    var transactions = repository.findAllByCategoryIsNullAndWalletIdAndUserId(walletId, userId, PageRequest.of(page, size));
     if (transactions.isEmpty()) {
       return null;
     }

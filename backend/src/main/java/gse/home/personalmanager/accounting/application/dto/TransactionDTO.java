@@ -16,5 +16,6 @@ public class TransactionDTO {
   private TransactionType type;
   private TransactionCategory category;
   private int relatedTransactionId;
-  private String accountName;
+  private Long walletId;
+  private String walletName;
 }

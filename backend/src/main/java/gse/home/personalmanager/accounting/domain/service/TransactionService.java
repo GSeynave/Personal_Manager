@@ -7,6 +7,8 @@ import gse.home.personalmanager.accounting.application.mapper.TransactionMapper;
 import gse.home.personalmanager.accounting.domain.model.Transaction;
 import gse.home.personalmanager.accounting.domain.model.TransactionCategory;
 import gse.home.personalmanager.accounting.domain.model.TransactionType;
+import gse.home.personalmanager.accounting.infrastructure.repository.WalletRepository;
+import gse.home.personalmanager.user.infrastructure.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 public class TransactionService {
 
   private final TransactionMapper mapper;
+  private final WalletRepository walletRepository;
+  private final UserRepository userRepository;
 
   public List<TransactionSummaryDTO> getTransactionCategoryDetails(List<Transaction> transactions) {
 
@@ -44,7 +48,7 @@ public class TransactionService {
         .map(Math::abs)
         .sum();
 
-    var accountSummary = new AccountingSummaryDTO(totalIncome, totalExpense, totalIncome - totalExpense);
+    var accountSummary = new AccountingSummaryDTO(totalIncome, totalExpense, totalIncome - totalExpense, null);
 
     // FIXME : Still need to apply the "Related Transaction"
 
@@ -77,10 +81,9 @@ public class TransactionService {
     return result;
   }
 
-  public AccountingSummaryDTO getTransactionSummary(List<Transaction> transactions) {
+  public AccountingSummaryDTO getTransactionSummary(List<Transaction> transactions, Double balance) {
     AtomicReference<Double> income = new AtomicReference<>(0.0);
     AtomicReference<Double> expense = new AtomicReference<>(0.0);
-    AtomicReference<Double> net = new AtomicReference<>(0.0);
     transactions.forEach(t -> {
       // Process each transaction to calculate income, expense, and saving
       if (TransactionType.CREDIT.equals(t.getType())) {
@@ -89,20 +92,29 @@ public class TransactionService {
         expense.getAndUpdate(v -> v + Math.abs(t.getAmount()));
       }
     });
+    
     return new AccountingSummaryDTO(
         BigDecimal.valueOf(income.get()).setScale(2, RoundingMode.CEILING).doubleValue(),
         BigDecimal.valueOf(expense.get()).setScale(2, RoundingMode.CEILING).doubleValue(),
         BigDecimal.valueOf(income.get().doubleValue() - expense.get().doubleValue()).setScale(2, RoundingMode.CEILING)
-            .doubleValue());
+            .doubleValue(),
+        balance);
   }
 
-  public List<Transaction> fromCSVRowToTransactionList(List<TransactionCSVRowDTO> csvRowDTOS) {
+  public List<Transaction> fromCSVRowToTransactionList(List<TransactionCSVRowDTO> csvRowDTOS, Long walletId, Long userId) {
+    var wallet = walletRepository.findById(walletId)
+        .orElseThrow(() -> new IllegalArgumentException("Wallet not found: " + walletId));
+    var user = userRepository.findById(userId)
+        .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+    
     return csvRowDTOS.stream()
-        .map(this::csvToTransaction)
+        .map(csvRow -> csvToTransaction(csvRow, wallet, user))
         .toList();
   }
 
-  private Transaction csvToTransaction(TransactionCSVRowDTO csvRowDTO) {
+  private Transaction csvToTransaction(TransactionCSVRowDTO csvRowDTO, 
+                                       gse.home.personalmanager.accounting.domain.model.Wallet wallet,
+                                       gse.home.personalmanager.user.domain.model.AppUser user) {
     var transaction = new Transaction();
     transaction.setAmount(csvRowDTO.getAmount());
     transaction.setType(csvRowDTO.getAmount() > 0 ? TransactionType.CREDIT : TransactionType.DEBIT);
@@ -110,6 +122,9 @@ public class TransactionService {
     transaction.setCategory(null);
     transaction.setCustomLabel("");
     transaction.setDate(csvRowDTO.getDate());
+    transaction.setCurrentBalance(csvRowDTO.getCurrentBalance());
+    transaction.setWallet(wallet);
+    transaction.setUser(user);
     return transaction;
   }
 }

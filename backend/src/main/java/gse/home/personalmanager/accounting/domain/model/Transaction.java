@@ -31,8 +31,8 @@ public class Transaction {
   private TransactionCategory category;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "account_id")
-  private Account account;
+  @JoinColumn(name = "wallet_id", nullable = false)
+  private Wallet wallet;
 
   /**
    * Use to link a CREDIT that is from a saving Account
@@ -48,4 +48,11 @@ public class Transaction {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private AppUser user;
+
+  /**
+   * The account balance at the time of this transaction.
+   * This value is imported from the bank CSV and represents
+   * the balance after this transaction was applied.
+   */
+  private Double currentBalance;
 }

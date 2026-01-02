@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type HabitData from '@/model/HabitData'
+import type HabitData from '@/model/habits/HabitData'
 import { Card, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Clock, Check, Calendar } from 'lucide-vue-next'

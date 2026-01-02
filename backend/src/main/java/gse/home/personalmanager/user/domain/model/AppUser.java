@@ -25,6 +25,10 @@ public class AppUser {
 
     private String role = "ROLE_USER";
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tenant_id")
+    private Tenant tenant;
+
     @CreatedDate
     private Long createdAt;
     @LastModifiedDate

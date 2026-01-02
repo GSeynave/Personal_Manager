@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CardContent from '../Dashboard/CardContent.vue'
+import CardContent from '@/components/core/Dashboard/CardContent.vue'
 
 const props = defineProps(['accountingSummary'])
 </script>

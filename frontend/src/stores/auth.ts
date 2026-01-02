@@ -1,8 +1,8 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import type { User } from 'firebase/auth'
-import FirebaseService from '@/services/FirebaseService'
-import UserService, { type UserIdentity } from '@/services/UserService'
+import FirebaseService from '@/services/core/FirebaseService'
+import UserService, { type UserIdentity } from '@/services/user/UserService'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
