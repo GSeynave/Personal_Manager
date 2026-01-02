@@ -13,4 +13,5 @@ public class TransactionCSVRowDTO {
     private LocalDate date;
     private Double amount;
     private String description;
+    private Double currentBalance;
 }

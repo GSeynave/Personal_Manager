@@ -13,6 +13,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("null")
 class NotificationServiceTest extends UnitTestBase {
 
     @Mock

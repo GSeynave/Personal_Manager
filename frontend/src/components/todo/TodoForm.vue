@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useTodoStore } from '@/stores/todo'
-import Todo from '@/model/Todo'
+import Todo from '@/model/todo/Todo'
 import { useAuthStore } from '@/stores/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { CirclePlus, X } from 'lucide-vue-next'
-import Card from '../ui/card/Card.vue'
+import Card from '@/components/ui/card/Card.vue'
 
 const todoStore = useTodoStore()
 const authStore = useAuthStore()

@@ -1,9 +1,9 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import TodoService from '@/services/TodoService'
-import Todo from '@/model/Todo'
-import TodoGroup from '@/model/TodoGroup'
-import TodosView from '@/model/TodosView'
+import TodoService from '@/services/todo/TodoService'
+import Todo from '@/model/todo/Todo'
+import TodoGroup from '@/model/todo/TodoGroup'
+import TodosView from '@/model/todo/TodosView'
 
 const todoService = new TodoService()
 

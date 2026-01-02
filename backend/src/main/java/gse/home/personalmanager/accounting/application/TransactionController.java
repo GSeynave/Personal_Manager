@@ -1,13 +1,12 @@
 package gse.home.personalmanager.accounting.application;
 
-import gse.home.personalmanager.accounting.application.dto.AccountingSummaryDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionCSVRowDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionSummaryDTO;
+import gse.home.personalmanager.accounting.application.dto.*;
 import gse.home.personalmanager.accounting.application.service.TransactionUseCaseService;
+import gse.home.personalmanager.user.domain.model.AppUserPrincipal;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -19,38 +18,58 @@ import java.util.List;
 @AllArgsConstructor
 public class TransactionController {
 
-    TransactionUseCaseService useCaseService;
+  TransactionUseCaseService useCaseService;
 
-    @GetMapping
-    public ResponseEntity<List<TransactionSummaryDTO>> getTodos(@RequestParam LocalDate minDate,
-                                                                @RequestParam LocalDate maxDate) {
-        log.info("Request to get all todos from {} to {}", minDate, maxDate);
-        return ResponseEntity.ok(useCaseService.getAllTransactions(minDate, maxDate));
-    }
+  @GetMapping
+  public ResponseEntity<List<TransactionSummaryDTO>> getTransactions(
+      @AuthenticationPrincipal AppUserPrincipal principal,
+      @RequestParam LocalDate minDate,
+      @RequestParam LocalDate maxDate,
+      @RequestParam Long walletId) {
+    log.debug("Request to get all transactions from {} to {} for wallet {}", minDate, maxDate, walletId);
+    return ResponseEntity.ok(useCaseService.getAllTransactions(minDate, maxDate, walletId, principal.getUser().getId()));
+  }
 
-    @GetMapping("/summary")
-    public ResponseEntity<AccountingSummaryDTO> getTransactionSummary(@RequestParam LocalDate minDate,
-                                                                      @RequestParam LocalDate maxDate) {
-        log.info("Request to get transaction summary from {} to {}", minDate, maxDate);
-        return ResponseEntity.ok(useCaseService.getTransactionSummary(minDate, maxDate));
-    }
+  @GetMapping("/summary")
+  public ResponseEntity<AccountingSummaryDTO> getTransactionSummary(
+      @AuthenticationPrincipal AppUserPrincipal principal,
+      @RequestParam LocalDate minDate,
+      @RequestParam LocalDate maxDate,
+      @RequestParam Long walletId) {
+    log.debug("Request to get transaction summary from {} to {} for wallet {}", minDate, maxDate, walletId);
+    return ResponseEntity.ok(useCaseService.getTransactionSummary(minDate, maxDate, walletId, principal.getUser().getId()));
+  }
 
-    @PostMapping("/csv")
-    public ResponseEntity<Integer> importCSVRows(@RequestBody List<TransactionCSVRowDTO> csvRowDTOList) {
-        log.info("Request to import the csv rows");
-        return ResponseEntity.ok(useCaseService.importCSVRows(csvRowDTOList));
-    }
+  @PostMapping("/csv")
+  public ResponseEntity<Integer> importCSVRows(
+      @AuthenticationPrincipal AppUserPrincipal principal,
+      @RequestParam Long walletId,
+      @RequestBody List<TransactionCSVRowDTO> csvRowDTOList) {
+    log.debug("Request to import the csv rows for wallet {}", walletId);
+    return ResponseEntity.ok(useCaseService.importCSVRows(csvRowDTOList, walletId, principal.getUser().getId()));
+  }
 
-    @GetMapping("/to-categorize")
-    public ResponseEntity<List<TransactionDTO>> getUncategorizedTransactions() {
-        log.info("Request to get uncategorized transactions");
-        return ResponseEntity.ok(useCaseService.getUncategorizedTransactions());
-    }
+  @GetMapping("/to-categorize")
+  public ResponseEntity<UncategorizedTransactionDTO> getUncategorizedTransactions(
+      @AuthenticationPrincipal AppUserPrincipal principal,
+      @RequestParam Long walletId,
+      @RequestParam int page,
+      @RequestParam int size) {
+    log.debug("Request to get uncategorized transactions for wallet {}", walletId);
+    return ResponseEntity.ok(useCaseService.getUncategorizedTransactions(walletId, principal.getUser().getId(), page, size));
+  }
 
-    @PutMapping("/categorize")
-    public ResponseEntity<Void> updateTransactionToCategorize(@RequestBody List<TransactionDTO> transactionDTOS) {
-        log.info("Request to update transactions");
-        useCaseService.updateTransactionsToCategorize(transactionDTOS);
-        return ResponseEntity.noContent().build();
-    }
+  @PutMapping("/categorize")
+  public ResponseEntity<Void> updateTransactionToCategorize(@RequestBody List<TransactionDTO> transactionDTOS) {
+    log.debug("Request to update transactions");
+    useCaseService.updateTransactionsToCategorize(transactionDTOS);
+    return ResponseEntity.noContent().build();
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> removeTransaction(@PathVariable int id) {
+    log.debug("Request to delete a transaction id={}", id);
+    useCaseService.deleteTransaction(id);
+    return ResponseEntity.noContent().build();
+  }
 }

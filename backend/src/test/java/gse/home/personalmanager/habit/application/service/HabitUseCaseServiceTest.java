@@ -153,25 +153,16 @@ class HabitUseCaseServiceTest extends UnitTestBase {
     @Test
     void updateHabit_shouldUpdateExistingHabit() {
         // Given
-        Habit spyHabit = spy(habit);
-        when(habitRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(spyHabit));
-        when(habitRepository.save(spyHabit)).thenReturn(spyHabit);
+        when(habitRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(habit));
+        when(habitRepository.save(habit)).thenReturn(habit);
 
         // When
         habitUseCaseService.updateHabit(1L, 1L, habitDTO);
 
         // Then
         verify(habitRepository).findByIdAndUserId(1L, 1L);
-        verify(spyHabit).updateDetails(
-                habitDTO.getTitle(),
-                habitDTO.getDescription(),
-                habitDTO.getCategory(),
-                habitDTO.getFrequency(),
-                habitDTO.getScheduledDays(),
-                habitDTO.getNumberOfTimes(),
-                habitDTO.getDuration()
-        );
-        verify(habitRepository).save(spyHabit);
+        verify(habitMapper).updateEntityFromDto(habitDTO, habit);
+        verify(habitRepository).save(habit);
     }
 
     @Test

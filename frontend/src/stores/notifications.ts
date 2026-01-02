@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { GamificationNotification } from '@/services/WebSocketService'
+import type { GamificationNotification } from '@/services/core/WebSocketService'
 
 export const useNotificationStore = defineStore('notifications', () => {
   const notifications = ref<GamificationNotification[]>([])

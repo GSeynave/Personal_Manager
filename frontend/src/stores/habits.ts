@@ -1,6 +1,6 @@
-import HabitData, { type HabitType, type HabitFrequency, type DayOfWeek } from '@/model/HabitData'
-import HabitLog from '@/model/HabitLog'
-import HabitsService from '@/services/HabitsService'
+import HabitData, { type HabitType, type HabitFrequency, type DayOfWeek } from '@/model/habits/HabitData'
+import HabitLog from '@/model/habits/HabitLog'
+import HabitsService from '@/services/habits/HabitsService'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 

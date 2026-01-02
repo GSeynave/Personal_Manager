@@ -1,29 +1,30 @@
 package gse.home.personalmanager.accounting.domain.model;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
+import java.util.List;
+
+@Setter
 @Getter
-public enum TransactionCategory {
-    NONE(0),
-    BILL(100),
-    DEBT(1100),
-    SALARY(2600),
-    INSURANCE(90),
-    SUBSCRIPTIONS(50),
-    HEALTH(40),
-    CAR(50),
-    GROSSERY(450),
-    SAVING(300),
-    HELP(0),
-    REFUND(0),
-    PET(30),
-    CHILDREN(100),
-    TRANSFER(0),
-    MISC(200);
+@Entity(name = "accounting_transaction_category")
+@Table(name = "accounting_transaction_category", indexes = {
+}, uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "title" }) })
+public class TransactionCategory {
 
-    private final Integer maxExpected;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  private int id;
+  private String title;
+  private String description;
+  private Double expectedAmount;
 
-    TransactionCategory(Integer maxExpected) {
-        this.maxExpected = maxExpected;
-    }
+  @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<TransactionCategory> categories;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "parent_category_id")
+  private TransactionCategory parentCategory;
 }

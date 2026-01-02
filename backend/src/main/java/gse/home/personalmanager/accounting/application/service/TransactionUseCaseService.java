@@ -1,15 +1,14 @@
 package gse.home.personalmanager.accounting.application.service;
 
-import gse.home.personalmanager.accounting.application.dto.AccountingSummaryDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionCSVRowDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionDTO;
-import gse.home.personalmanager.accounting.application.dto.TransactionSummaryDTO;
+import gse.home.personalmanager.accounting.application.dto.*;
 import gse.home.personalmanager.accounting.application.mapper.TransactionMapper;
-import gse.home.personalmanager.accounting.domain.model.TransactionCategory;
 import gse.home.personalmanager.accounting.domain.service.TransactionService;
+import gse.home.personalmanager.accounting.domain.service.WalletService;
 import gse.home.personalmanager.accounting.infrastructure.repository.TransactionRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -21,74 +20,97 @@ import java.util.concurrent.atomic.AtomicReference;
 @AllArgsConstructor
 public class TransactionUseCaseService {
 
-    private final TransactionRepository repository;
-    private final TransactionMapper mapper;
-    private final TransactionService transactionService;
+  private final TransactionRepository repository;
+  private final TransactionMapper mapper;
+  private final TransactionService transactionService;
+  private final WalletService walletService;
 
-    /**
-     * Retrieves all transactions.
-     * This is used to display them in the accounting overview screen.
-     * TODO: This will need to be filtered by date range in the future.
-     * TODO: This will need to be regrouped by categories in the future.
-     * TODO: This will need to give balance information in the future.
-     * TODO: This will need to give category maximums for budgeting in the future.
-     * TODO: This will need to give percent of total per category in the future.
-     */
-    public List<TransactionSummaryDTO> getAllTransactions(LocalDate minDate, LocalDate maxDate) {
-        /*
-         * Retrieves all transactions from the repository,
-         * from a given "filter" criteria in the future.
-         * The filter will be date range at first (monthly view).
-         */
-        // to be implemented
-        // Apply a cache of a few minutes to avoid hitting the database too often
-        var transactions = repository.findAllByDateBetween(minDate, maxDate);
-        return transactionService.getTransactionCategoryDetails(transactions);
+  /**
+   * Retrieves all transactions.
+   * This is used to display them in the accounting overview screen.
+   * Transactions are filtered by date range, wallet (optional), and user.
+   * TODO: This will need to give balance information in the future.
+   * TODO: This will need to give category maximums for budgeting in the future.
+   * TODO: This will need to give percent of total per category in the future.
+   */
+  public List<TransactionSummaryDTO> getAllTransactions(LocalDate minDate, LocalDate maxDate, Long walletId, Long userId) {
+    // Apply a cache of a few minutes to avoid hitting the database too often
+    var transactions = getTransactionsByDateAndWallet(minDate, maxDate, walletId, userId);
+    return transactionService.getTransactionCategoryDetails(transactions);
+  }
+
+  public AccountingSummaryDTO getTransactionSummary(LocalDate minDate, LocalDate maxDate, Long walletId, Long userId) {
+    // Implementation to retrieve transaction summary between minDate and maxDate
+    // filtered by wallet if provided
+
+    // Apply a cache of a few minutes to avoid hitting the database too often
+    var transactions = getTransactionsByDateAndWallet(minDate, maxDate, walletId, userId);
+    
+    // Get current wallet balance
+    Double balance = walletId != null ? walletService.getCurrentBalance(walletId) : null;
+    
+    return transactionService.getTransactionSummary(transactions, balance);
+  }
+
+  private List<gse.home.personalmanager.accounting.domain.model.Transaction> getTransactionsByDateAndWallet(
+      LocalDate minDate, LocalDate maxDate, Long walletId, Long userId) {
+    return repository.findAllByDateBetweenAndWalletIdAndUserId(minDate, maxDate, walletId, userId);
+  }
+
+  public Integer importCSVRows(List<TransactionCSVRowDTO> csvRowDTOList, Long walletId, Long userId) {
+    if (csvRowDTOList == null || csvRowDTOList.isEmpty()) {
+      log.warn("No rows found in the CSV");
+      return 0;
     }
 
-    public AccountingSummaryDTO getTransactionSummary(LocalDate minDate, LocalDate maxDate) {
-        // Implementation to retrieve transaction summary between minDate and maxDate
+    var transactions = transactionService.fromCSVRowToTransactionList(csvRowDTOList, walletId, userId);
 
-        // Apply a cache of a few minutes to avoid hitting the database too often
-        var transactions = repository.findAllByDateBetween(minDate, maxDate);
-        return transactionService.getTransactionSummary(transactions);
+    AtomicReference<Integer> totalSaved = new AtomicReference<>(0);
+    transactions.forEach(t -> {
+      try {
+        repository.save(t);
+        totalSaved.getAndSet(totalSaved.get() + 1);
+        // for each saved transaction, publish the transactionToBeCategorized event see
+        // file auto-categorization-decision.md
+        //
+        // to be handled by the TransactionCategorizationService
+        // eventPublisher.publishEvent(new TransactionToBeCategorizedEvent(this, t));
+      } catch (Exception ignored) {
+      }
+    });
+    return totalSaved.get();
+  }
+
+  public UncategorizedTransactionDTO getUncategorizedTransactions(Long walletId, Long userId, int page, int size) {
+    var transactions = repository.findAllByCategoryIsNullAndWalletIdAndUserId(walletId, userId, PageRequest.of(page, size));
+    if (transactions.isEmpty()) {
+      return null;
     }
+    var transactionDtos = transactions.stream().map(mapper::toDto).toList();
 
-    public Integer importCSVRows(List<TransactionCSVRowDTO> csvRowDTOList) {
-        if (csvRowDTOList == null || csvRowDTOList.isEmpty()) {
-            log.warn("No rows found in the CSV");
-            return 0;
-        }
+    return UncategorizedTransactionDTO.builder()
+        .transactions(transactionDtos)
+        .page(transactions.getPageable().getPageNumber())
+        .totalElements(transactions.getNumberOfElements())
+        .totalPage(transactions.getTotalPages())
+        .build();
+  }
 
-        var transactions = transactionService.fromCSVRowToTransactionList(csvRowDTOList);
-        AtomicReference<Integer> totalSaved = new AtomicReference<>(0);
-        transactions.forEach(t -> {
-            try {
-                repository.save(t);
-                totalSaved.getAndSet(totalSaved.get() + 1);
-            } catch (Exception ignored) {
-            }
-        });
-        return totalSaved.get();
-    }
+  public void updateTransactionsToCategorize(List<TransactionDTO> transactionDTOS) {
+    transactionDTOS.forEach(t -> repository.findById(t.getId())
+        .ifPresent(e -> {
+          e.setCategory(t.getCategory());
+          // This can improve to request only 1 time per similar id using a hashmap. if
+          // multiple
+          // getRelatedTransactionId in the List of transactionDtos
+          e.setRelatedTransaction(repository.findById(t.getRelatedTransactionId()).orElse(null));
+          e.setCustomLabel(t.getCustomLabel());
+          repository.save(e);
+        }));
 
-    public List<TransactionDTO> getUncategorizedTransactions() {
-        var transactions = repository.findAllByCategory(TransactionCategory.NONE);
-        if (transactions.isEmpty()) {
-            return null;
-        }
-        return transactions.stream().map(mapper::toDto).toList();
-    }
+  }
 
-    public void updateTransactionsToCategorize(List<TransactionDTO> transactionDTOS) {
-        transactionDTOS.forEach(t ->
-                repository.findById(t.getId())
-                        .ifPresent(e -> {
-                            e.setCategory(t.getCategory());
-                            e.setSubCategory(t.getSubCategory());
-                            e.setCustomCategory(t.getCustomCategory());
-                            repository.save(e);
-                        }));
-
-    }
+  public void deleteTransaction(int id) {
+    repository.deleteById(id);
+  }
 }

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Infinity, Plus, X, CircleCheck, Circle } from 'lucide-vue-next'
 import TodoComponent from './TodoComponent.vue'
-import Card from '../ui/card/Card.vue'
+import Card from '@/components/ui/card/Card.vue'
 
 const todoStore = useTodoStore()
 const showGroupForm = ref(false)

@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * - DELETE /v1/habits/{habitId}/logs/{logId} - delete a habit log
  * </p>
  */
+@SuppressWarnings("null")
 @WebMvcTest(controllers = HabitLogController.class)
 class HabitLogControllerTest extends BaseControllerTest {
 

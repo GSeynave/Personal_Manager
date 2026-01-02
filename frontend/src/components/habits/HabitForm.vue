@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import type { HabitType, HabitFrequency, DayOfWeek } from '@/model/HabitData'
+import type { HabitType, HabitFrequency, DayOfWeek } from '@/model/habits/HabitData'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'

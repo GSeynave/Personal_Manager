@@ -1,6 +1,6 @@
 import { computed, type Ref } from 'vue'
-import type HabitData from '@/model/HabitData'
-import type HabitLog from '@/model/HabitLog'
+import type HabitData from '@/model/habits/HabitData'
+import type HabitLog from '@/model/habits/HabitLog'
 
 export function useHabitHelpers(
   habitLogs: Ref<Map<number, HabitLog[]>>,

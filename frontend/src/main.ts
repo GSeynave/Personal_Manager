@@ -23,8 +23,8 @@ themeStore.init()
 
 // Initialize auth store
 import { useAuthStore } from './stores/auth'
-import FirebaseService from './services/FirebaseService'
-import { setupAxiosInterceptor } from './services/axiosInterceptor'
+import FirebaseService from './services/core/FirebaseService'
+import { setupAxiosInterceptor } from './services/core/axiosInterceptor'
 
 // Initialize Firebase immediately
 FirebaseService.initFirebase()
