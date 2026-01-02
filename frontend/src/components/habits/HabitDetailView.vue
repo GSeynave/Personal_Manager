@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type HabitData from '@/model/HabitData'
-import type HabitLog from '@/model/HabitLog'
+import type HabitData from '@/model/habits/HabitData'
+import type HabitLog from '@/model/habits/HabitLog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'

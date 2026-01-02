@@ -19,6 +19,7 @@
     "@stomp/stompjs": "^7.0.0",
     "@vueuse/core": "^14.1.0",
     "axios": "^1.13.1",
+    "chart.js": "^4.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "firebase": "^12.6.0",
@@ -30,6 +31,7 @@
     "sortablejs": "^1.15.6",
     "tailwind-merge": "^3.4.0",
     "vue": "^3.5.22",
+    "vue-chartjs": "^5.3.3",
     "vue-csv-import": "^4.1.2",
     "vue-router": "^4.6.3"
   },

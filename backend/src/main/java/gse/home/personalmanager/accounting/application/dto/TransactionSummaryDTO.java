@@ -10,9 +10,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransactionSummaryDTO {
-    private String category;
-    private Double expense;
-    private Integer percent;
-    private Integer maxExpected;
-    private List<TransactionDTO> transactions;
+  private Double totalExpense;
+  private Double totalIncome;
+  private String category;
+  private Integer percent;
+  private Double expectedAmount;
+  private List<TransactionDTO> transactions;
+  private List<TransactionSummaryDTO> nestedTransactionSummaries;
 }
