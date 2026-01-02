@@ -9,4 +9,5 @@ public class AccountingSummaryDTO {
   private Double income;
   private Double expense;
   private Double net;
+  private Double balance;
 }

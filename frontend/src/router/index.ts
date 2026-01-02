@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import TodoView from '@/views/TodoView.vue'
-import AccountingView from '@/views/AccoutingView.vue'
+import HomeView from '../views/core/HomeView.vue'
+import TodoView from '@/views/todo/TodoView.vue'
+import AccountingView from '@/views/accounting/AccoutingView.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
@@ -27,31 +27,31 @@ const router = createRouter({
     {
       path: '/habits',
       name: 'habits',
-      component: () => import('../views/HabitsView.vue'),
+      component: () => import('../views/habits/HabitsView.vue'),
       meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import('../views/LoginView.vue'),
+      component: () => import('../views/core/LoginView.vue'),
       meta: { requiresGuest: true }, // Only for non-authenticated users
     },
     {
       path: '/first-connection',
       name: 'first-connection',
-      component: () => import('../views/FirstConnectionView.vue'),
+      component: () => import('../views/core/FirstConnectionView.vue'),
       meta: { requiresAuth: true, skipIdentityCheck: true }, // Requires auth but skips identity check
     },
     {
       path: '/profile',
       name: 'profile',
-      component: () => import('../views/ProfileView.vue'),
+      component: () => import('../views/user/ProfileView.vue'),
       meta: { requiresAuth: true }, // Requires auth but not identity
     },
     {
       path: '/progress',
       name: 'progress',
-      component: () => import('../views/ProgressView.vue'),
+      component: () => import('../views/core/ProgressView.vue'),
       meta: { requiresAuth: true, requiresIdentity: true }, // Requires auth and identity
     },
   ],

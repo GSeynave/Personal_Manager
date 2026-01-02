@@ -6,6 +6,7 @@ import gse.home.personalmanager.core.utils.JwtUtils;
 import gse.home.personalmanager.user.application.service.UserAuthService;
 import gse.home.personalmanager.user.domain.model.AppUser;
 import gse.home.personalmanager.user.domain.model.AppUserPrincipal;
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+
 @Component
 public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
@@ -27,9 +29,10 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
         this.userAuthService = userAuthService;
     }
 
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws IOException {
+    @Override
+    protected void doFilterInternal(@Nonnull HttpServletRequest request,
+                                    @Nonnull HttpServletResponse response,
+                                    @Nonnull FilterChain filterChain) throws IOException {
         try {
             // 1. Extract token from Authorization header
             String token = extractToken(request);

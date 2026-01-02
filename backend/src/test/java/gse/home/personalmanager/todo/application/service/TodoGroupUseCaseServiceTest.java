@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("null")
 class TodoGroupUseCaseServiceTest extends UnitTestBase {
 
     @Mock
