@@ -19,10 +19,47 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
     },
     {
+      path: '/finance/overview',
+      name: 'finance-overview',
+      component: () => import('../views/accounting/OverviewView.vue'),
+      meta: { requiresAuth: true, requiresIdentity: true },
+    },
+    {
+      path: '/finance/transactions',
+      name: 'finance-transactions',
+      component: () => import('../views/accounting/TransactionsView.vue'),
+      meta: { requiresAuth: true, requiresIdentity: true },
+    },
+    {
+      path: '/finance/categories',
+      name: 'finance-categories',
+      component: () => import('../views/accounting/CategoriesView.vue'),
+      meta: { requiresAuth: true, requiresIdentity: true },
+    },
+    {
+      path: '/finance/import',
+      name: 'finance-import',
+      component: () => import('../views/accounting/ImportView.vue'),
+      meta: { requiresAuth: true, requiresIdentity: true },
+    },
+    {
+      path: '/finance/budgets',
+      name: 'finance-budgets',
+      component: () => import('../views/accounting/BudgetsView.vue'),
+      meta: { requiresAuth: true, requiresIdentity: true },
+    },
+    // Redirects for old URLs
+    {
+      path: '/finance',
+      redirect: '/finance/overview',
+    },
+    {
+      path: '/finance/categorize',
+      redirect: '/finance/transactions',
+    },
+    {
       path: '/accounting',
-      name: 'accounting',
-      component: AccountingView,
-      meta: { requiresAuth: true, requiresIdentity: true }, // Protected route
+      redirect: '/finance/overview',
     },
     {
       path: '/habits',

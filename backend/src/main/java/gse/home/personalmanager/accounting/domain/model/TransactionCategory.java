@@ -19,6 +19,7 @@ public class TransactionCategory {
   private int id;
   private String title;
   private String description;
+  private String icon;
   private Double expectedAmount;
 
   @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)

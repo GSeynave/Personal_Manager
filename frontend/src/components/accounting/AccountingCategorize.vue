@@ -2,22 +2,73 @@
 import { onMounted, ref } from 'vue'
 import AccountingService from '@/services/accounting/AccountingService'
 import WalletService from '@/services/accounting/WalletService'
+import TransactionCategoryService from '@/services/accounting/TransactionCategoryService'
 import TransactionCategory from '@/model/accounting/TransactionCategory'
+import type { TransactionCategoryDTO } from '@/model/accounting/TransactionCategory'
 import type { Wallet } from '@/model/accounting/Wallet'
+import type Transaction from '@/model/accounting/Transaction'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import CardContent from '@/components/core/Dashboard/CardContent.vue'
+import TransactionCategoryDialog from '@/components/accounting/TransactionCategoryDialog.vue'
+import CategoryCreateDialog from '@/components/accounting/CategoryCreateDialog.vue'
 import { Tags, Save, Wallet as WalletIcon } from 'lucide-vue-next'
 import type UncategorizedTransactions from '@/model/accounting/UncategorizedTransactions'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useAccountingStore } from '@/stores/accounting'
 
 const accountingService = new AccountingService()
 const walletService = new WalletService()
+const categoryService = new TransactionCategoryService()
+const accountingStore = useAccountingStore()
 const toCategorize = ref<UncategorizedTransactions>()
 const wallets = ref<Wallet[]>([])
 const selectedWalletId = ref<string | null>(null)
+const categories = ref<TransactionCategoryDTO[]>([])
+const categoryDialogOpen = ref(false)
+const createCategoryDialogOpen = ref(false)
+const selectedTransaction = ref<Transaction | null>(null)
+const recentCategoryIds = ref<number[]>([])
+
+// Track recently used categories (last 7 days)
+const RECENT_CATEGORIES_KEY = 'recent-transaction-categories'
+const RECENT_CATEGORIES_MAX = 5
+
+function loadRecentCategories() {
+  try {
+    const stored = localStorage.getItem(RECENT_CATEGORIES_KEY)
+    if (stored) {
+      const data = JSON.parse(stored)
+      const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000)
+      // Filter categories used within last 7 days
+      const recent = data
+        .filter((item: any) => item.timestamp > sevenDaysAgo)
+        .map((item: any) => item.categoryId)
+      recentCategoryIds.value = [...new Set(recent)].slice(0, RECENT_CATEGORIES_MAX)
+    }
+  } catch (error) {
+    console.error('Error loading recent categories:', error)
+  }
+}
+
+function addRecentCategory(categoryId: number) {
+  try {
+    const stored = localStorage.getItem(RECENT_CATEGORIES_KEY)
+    let data = stored ? JSON.parse(stored) : []
+    
+    // Add new entry
+    data.unshift({ categoryId, timestamp: Date.now() })
+    
+    // Keep only last 50 entries
+    data = data.slice(0, 50)
+    
+    localStorage.setItem(RECENT_CATEGORIES_KEY, JSON.stringify(data))
+    loadRecentCategories()
+  } catch (error) {
+    console.error('Error saving recent category:', error)
+  }
+}
 
 async function loadWallets() {
   try {
@@ -49,9 +100,42 @@ function loadTransactions() {
 
 onMounted(() => {
   loadWallets()
+  loadCategories()
+  loadRecentCategories()
 })
 
-const categories = Object.values(TransactionCategory)
+async function loadCategories() {
+  try {
+    categories.value = await categoryService.getRootCategories()
+  } catch (error) {
+    console.error('Error loading categories:', error)
+  }
+}
+
+function openCategoryDialog(transaction: Transaction) {
+  selectedTransaction.value = transaction
+  categoryDialogOpen.value = true
+}
+
+function handleCategorySelected(category: TransactionCategoryDTO) {
+  if (selectedTransaction.value) {
+    // Update the transaction with the selected category
+    selectedTransaction.value.category = category as any // TODO: Fix type mismatch
+    // Track this category as recently used
+    addRecentCategory(category.id)
+  }
+}
+
+function handleCategoryCreated(category: TransactionCategoryDTO) {
+  // Reload categories to include the new one
+  loadCategories()
+  // Optionally select it for the current transaction
+  if (selectedTransaction.value) {
+    selectedTransaction.value.category = category as any
+  }
+}
+
+const oldCategories = Object.values(TransactionCategory)
   .filter((k) => isNaN(Number(k)))
   .map((cat) => ({ label: cat, value: cat }))
 
@@ -61,6 +145,10 @@ function updateToCategorize() {
     .then(() => {
       console.log('Transactions updated successfully')
       loadTransactions()
+      // Update the uncategorized count in the store
+      if (selectedWalletId.value) {
+        accountingStore.fetchUncategorizedCount(parseInt(selectedWalletId.value))
+      }
     })
     .catch((err) => {
       console.error('Error updating transactions:', err)
@@ -119,31 +207,29 @@ function isPositive(amount: number): boolean {
                 <TableHead>Description</TableHead>
                 <TableHead>Amount</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead>Subcategory</TableHead>
-                <TableHead>Custom Category</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <!-- TODO turn this into a data table ? for pagination -->
               <TableRow v-for="(transaction, idx) in toCategorize.transactions" :key="idx">
                 <TableCell>{{ transaction.date }}</TableCell>
                 <TableCell>{{ transaction.importLabel }}</TableCell>
-                <TableCell :class="isPositive(transaction.amount) ? 'text-green-400' : 'text-red-400'">{{
-                  transaction.amount }}</TableCell>
-                <TableCell>
-                  <Select v-model="transaction.category">
-                    <SelectTrigger class="w-[180px]">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem v-for="cat in categories" :key="cat.value" :value="cat.value">
-                        {{ cat.label }}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                <TableCell :class="isPositive(transaction.amount) ? 'text-green-400' : 'text-red-400'">
+                  {{ transaction.amount }}€
                 </TableCell>
                 <TableCell>
-                  <Input v-model="transaction.customLabel" type="text" class="w-full" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    @click="openCategoryDialog(transaction)"
+                    class="w-full justify-start"
+                  >
+                    <span v-if="transaction.category">
+                      {{ typeof transaction.category === 'object' ? transaction.category.title : transaction.category }}
+                    </span>
+                    <span v-else class="text-muted-foreground">
+                      Select category...
+                    </span>
+                  </Button>
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -162,6 +248,22 @@ function isPositive(amount: number): boolean {
         <p>No transactions to categorize</p>
       </div>
     </CardContent>
+
+    <!-- Category Selection Dialog -->
+    <TransactionCategoryDialog
+      v-model:open="categoryDialogOpen"
+      :transaction-label="selectedTransaction?.importLabel || ''"
+      :recent-category-ids="recentCategoryIds"
+      @category-selected="handleCategorySelected"
+      @create-category="createCategoryDialogOpen = true"
+    />
+
+    <!-- Create Category Dialog -->
+    <CategoryCreateDialog
+      v-model:open="createCategoryDialogOpen"
+      :categories="categories"
+      @category-created="handleCategoryCreated"
+    />
   </div>
 </template>
 

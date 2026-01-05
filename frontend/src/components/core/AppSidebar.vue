@@ -18,9 +18,11 @@ import {
 import { LogOut, User, Sparkles, Moon, Sun, Lock } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
+import { useAccountingStore } from '@/stores/accounting'
 
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
+const accountingStore = useAccountingStore()
 const router = useRouter()
 
 async function handleLogout() {
@@ -28,12 +30,12 @@ async function handleLogout() {
   router.push('/login')
 }
 
-
 interface ModuleItem {
   id: string
   label: string
   to: string
   locked?: boolean
+  badge?: () => number
 }
 
 interface ModuleCategory {
@@ -65,7 +67,16 @@ const categories = ref<ModuleCategory[]>([
     label: 'Finance & Resources',
     color: 'accounting',
     modules: [
-      { id: 'accounting', label: 'Accounting', to: '/accounting' },
+      { id: 'overview', label: 'Overview', to: '/finance/overview' },
+      { 
+        id: 'transactions', 
+        label: 'Transactions', 
+        to: '/finance/transactions',
+        badge: () => accountingStore.uncategorizedCount
+      },
+      { id: 'categories', label: 'Categories', to: '/finance/categories' },
+      { id: 'import', label: 'Import', to: '/finance/import' },
+      { id: 'budgets', label: 'Budgets', to: '/finance/budgets', locked: true },
     ],
   },
 ])
@@ -97,6 +108,10 @@ const categories = ref<ModuleCategory[]>([
                 >
                   <RouterLink v-if="!module.locked" :to="module.to">
                     <span>{{ module.label }}</span>
+                    <span 
+                      v-if="module.badge && module.badge() > 0"
+                      class="ml-auto flex h-2 w-2 rounded-full bg-orange-500"
+                    />
                   </RouterLink>
                   <div v-else class="flex items-center justify-between w-full">
                     <span>{{ module.label }}</span>

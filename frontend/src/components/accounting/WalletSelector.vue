@@ -6,8 +6,10 @@ import { Plus, Pencil, Trash2 } from 'lucide-vue-next'
 import type { Wallet } from '@/model/accounting/Wallet'
 import WalletService from '@/services/accounting/WalletService'
 import WalletDialog from './WalletDialog.vue'
+import { useAccountingStore } from '@/stores/accounting'
 
 const walletService = new WalletService()
+const accountingStore = useAccountingStore()
 
 const wallets = ref<Wallet[]>([])
 const selectedWalletId = ref<number | null>(null)
@@ -47,6 +49,9 @@ function selectWallet(walletId: number) {
   selectedWalletId.value = walletId
   emit('walletSelected', walletId)
   emit('walletChanged', selectedWallet.value)
+  
+  // Update uncategorized count in store
+  accountingStore.fetchUncategorizedCount(walletId)
 }
 
 function openCreateDialog() {
@@ -86,7 +91,10 @@ async function handleDeleteWallet(wallet: Wallet) {
   }
 }
 
-function formatCurrency(amount: number): string {
+function formatCurrency(amount: number | null | undefined): string {
+  if (amount === null || amount === undefined) {
+    return '€ -,--'
+  }
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'EUR',
@@ -142,7 +150,14 @@ onMounted(() => {
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between gap-2 mb-1">
               <h3 class="font-medium text-foreground truncate">{{ wallet.name }}</h3>
-              <span v-if="wallet.balance !== undefined" class="text-sm font-semibold text-accounting flex-shrink-0">
+              <span 
+                :class="[
+                  'text-sm font-semibold flex-shrink-0',
+                  wallet.balance === null || wallet.balance === undefined 
+                    ? 'text-muted-foreground' 
+                    : 'text-accounting'
+                ]"
+              >
                 {{ formatCurrency(wallet.balance) }}
               </span>
             </div>

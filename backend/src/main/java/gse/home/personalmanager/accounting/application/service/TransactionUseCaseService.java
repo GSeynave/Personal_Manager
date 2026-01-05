@@ -4,6 +4,7 @@ import gse.home.personalmanager.accounting.application.dto.*;
 import gse.home.personalmanager.accounting.application.mapper.TransactionMapper;
 import gse.home.personalmanager.accounting.domain.service.TransactionService;
 import gse.home.personalmanager.accounting.domain.service.WalletService;
+import gse.home.personalmanager.accounting.infrastructure.repository.TransactionCategoryRepository;
 import gse.home.personalmanager.accounting.infrastructure.repository.TransactionRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class TransactionUseCaseService {
 
   private final TransactionRepository repository;
+  private final TransactionCategoryRepository categoryRepository;
   private final TransactionMapper mapper;
   private final TransactionService transactionService;
   private final WalletService walletService;
@@ -33,7 +35,8 @@ public class TransactionUseCaseService {
    * TODO: This will need to give category maximums for budgeting in the future.
    * TODO: This will need to give percent of total per category in the future.
    */
-  public List<TransactionSummaryDTO> getAllTransactions(LocalDate minDate, LocalDate maxDate, Long walletId, Long userId) {
+  public List<TransactionSummaryDTO> getAllTransactions(LocalDate minDate, LocalDate maxDate, Long walletId,
+      Long userId) {
     // Apply a cache of a few minutes to avoid hitting the database too often
     var transactions = getTransactionsByDateAndWallet(minDate, maxDate, walletId, userId);
     return transactionService.getTransactionCategoryDetails(transactions);
@@ -45,10 +48,10 @@ public class TransactionUseCaseService {
 
     // Apply a cache of a few minutes to avoid hitting the database too often
     var transactions = getTransactionsByDateAndWallet(minDate, maxDate, walletId, userId);
-    
+
     // Get current wallet balance
     Double balance = walletId != null ? walletService.getCurrentBalance(walletId) : null;
-    
+
     return transactionService.getTransactionSummary(transactions, balance);
   }
 
@@ -82,7 +85,8 @@ public class TransactionUseCaseService {
   }
 
   public UncategorizedTransactionDTO getUncategorizedTransactions(Long walletId, Long userId, int page, int size) {
-    var transactions = repository.findAllByCategoryIsNullAndWalletIdAndUserId(walletId, userId, PageRequest.of(page, size));
+    var transactions = repository.findAllByCategoryIsNullAndWalletIdAndUserId(walletId, userId,
+        PageRequest.of(page, size));
     if (transactions.isEmpty()) {
       return null;
     }
@@ -96,18 +100,27 @@ public class TransactionUseCaseService {
         .build();
   }
 
-  public void updateTransactionsToCategorize(List<TransactionDTO> transactionDTOS) {
-    transactionDTOS.forEach(t -> repository.findById(t.getId())
-        .ifPresent(e -> {
-          e.setCategory(t.getCategory());
-          // This can improve to request only 1 time per similar id using a hashmap. if
-          // multiple
-          // getRelatedTransactionId in the List of transactionDtos
-          e.setRelatedTransaction(repository.findById(t.getRelatedTransactionId()).orElse(null));
-          e.setCustomLabel(t.getCustomLabel());
-          repository.save(e);
-        }));
+  public void updateTransactionToCategorize(TransactionDTO transactionDTO) {
+    repository.findById(transactionDTO.getId())
+        .ifPresent(transaction -> {
+          // Update category if categoryId is provided or extract from nested category object
+          Integer categoryId = transactionDTO.getCategoryId();
+          if (categoryId == null && transactionDTO.getCategory() != null) {
+            categoryId = transactionDTO.getCategory().getId();
+          }
+          
+          if (categoryId != null) {
+            categoryRepository.findById(categoryId)
+                .ifPresent(transaction::setCategory);
+          }
+          
+          transaction.setCustomLabel(transactionDTO.getCustomLabel());
+          repository.save(transaction);
+        });
+  }
 
+  public void updateTransactionsToCategorize(List<TransactionDTO> transactionDTOS) {
+    transactionDTOS.forEach(this::updateTransactionToCategorize);
   }
 
   public void deleteTransaction(int id) {

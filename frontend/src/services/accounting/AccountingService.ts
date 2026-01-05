@@ -48,8 +48,13 @@ export default class AccountingService {
     return response.data;
   }
 
-  async updateTransaction(transactions: Transaction[]): Promise<void> {
-    await axios.put(`${API_URL}/categorize`, transactions);
+  async updateTransaction(transaction: Transaction, categoryId?: number): Promise<void> {
+    const body = {
+      id: transaction.id,
+      categoryId: categoryId,
+      customLabel: transaction.customLabel || null
+    };
+    await axios.put(`${API_URL}/categorize`, body);
   }
 
 }
