@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateWalletPermissionRequest {
-    @NotNull(message = "Role is required")
-    private WalletRole role;
+  @NotNull(message = "Role is required")
+  private WalletRole role;
 }

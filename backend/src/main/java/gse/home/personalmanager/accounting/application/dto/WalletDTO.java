@@ -10,14 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WalletDTO {
-    private Long id;
-    private String name;
-    private String description;
-    private Long ownerId;
-    private String ownerEmail;
-    private Long tenantId;
-    private String tenantName;
-    private Long createdAt;
-    private Long updatedAt;
-    private Double balance;
+  private Long id;
+  private String name;
+  private String description;
+  private Long ownerId;
+  private String ownerEmail;
+  private Long tenantId;
+  private Long createdAt;
+  private Long updatedAt;
+  private Double balance;
 }

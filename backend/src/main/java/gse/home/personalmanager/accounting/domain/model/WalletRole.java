@@ -1,6 +1,8 @@
 package gse.home.personalmanager.accounting.domain.model;
 
 public enum WalletRole {
-    READ,
-    WRITE
+  NONE,
+  READ,
+  WRITE,
+  OWNER
 }

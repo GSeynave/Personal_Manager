@@ -12,12 +12,10 @@ import java.util.List;
 public interface TransactionCategoryMapper {
 
   @Mapping(source = "parentCategory.id", target = "parentCategoryId")
-  @Mapping(source = "parentCategory.title", target = "parentCategoryTitle")
   @Mapping(target = "subCategories", ignore = true)
   TransactionCategoryDTO toDto(TransactionCategory category);
 
   @Mapping(source = "parentCategory.id", target = "parentCategoryId")
-  @Mapping(source = "parentCategory.title", target = "parentCategoryTitle")
   @Mapping(source = "categories", target = "subCategories", qualifiedByName = "mapSubCategories")
   TransactionCategoryDTO toDtoWithSubCategories(TransactionCategory category);
 

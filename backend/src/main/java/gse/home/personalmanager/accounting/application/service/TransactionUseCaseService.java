@@ -1,20 +1,29 @@
 package gse.home.personalmanager.accounting.application.service;
 
-import gse.home.personalmanager.accounting.application.dto.*;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+
+import gse.home.personalmanager.accounting.application.dto.AccountingSummaryDTO;
+import gse.home.personalmanager.accounting.application.dto.PaginationDTO;
+import gse.home.personalmanager.accounting.application.dto.TransactionCSVRowDTO;
+import gse.home.personalmanager.accounting.application.dto.TransactionDTO;
+import gse.home.personalmanager.accounting.application.dto.TransactionFilterDTO;
+import gse.home.personalmanager.accounting.application.dto.TransactionPageDTO;
+import gse.home.personalmanager.accounting.application.dto.TransactionPageRequestDTO;
+import gse.home.personalmanager.accounting.application.dto.TransactionSummaryDTO;
+import gse.home.personalmanager.accounting.application.dto.UncategorizedTransactionDTO;
 import gse.home.personalmanager.accounting.application.mapper.TransactionMapper;
+import gse.home.personalmanager.accounting.domain.model.Transaction;
 import gse.home.personalmanager.accounting.domain.service.TransactionService;
 import gse.home.personalmanager.accounting.domain.service.WalletService;
 import gse.home.personalmanager.accounting.infrastructure.repository.TransactionCategoryRepository;
 import gse.home.personalmanager.accounting.infrastructure.repository.TransactionRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @Slf4j
@@ -27,37 +36,48 @@ public class TransactionUseCaseService {
   private final TransactionService transactionService;
   private final WalletService walletService;
 
-  /**
-   * Retrieves all transactions.
-   * This is used to display them in the accounting overview screen.
-   * Transactions are filtered by date range, wallet (optional), and user.
-   * TODO: This will need to give balance information in the future.
-   * TODO: This will need to give category maximums for budgeting in the future.
-   * TODO: This will need to give percent of total per category in the future.
-   */
-  public List<TransactionSummaryDTO> getAllTransactions(LocalDate minDate, LocalDate maxDate, Long walletId,
+  public TransactionPageDTO getAllTransactions(TransactionPageRequestDTO pageRequest,
       Long userId) {
-    // Apply a cache of a few minutes to avoid hitting the database too often
-    var transactions = getTransactionsByDateAndWallet(minDate, maxDate, walletId, userId);
-    return transactionService.getTransactionCategoryDetails(transactions);
+
+    var transactions = getTransactionsByDateAndWallet(pageRequest.filter(), pageRequest.pagination(), userId);
+
+    return TransactionPageDTO.builder()
+        .transactions(transactions.stream()
+            .map(mapper::toDto)
+            .toList())
+        .page(transactions.getPageable().getPageNumber())
+        .totalElements(transactions.getTotalElements())
+        .totalPages(transactions.getTotalPages())
+        .build();
   }
 
-  public AccountingSummaryDTO getTransactionSummary(LocalDate minDate, LocalDate maxDate, Long walletId, Long userId) {
-    // Implementation to retrieve transaction summary between minDate and maxDate
-    // filtered by wallet if provided
+  public List<TransactionSummaryDTO> getTransactionsOverview(TransactionFilterDTO filter, PaginationDTO pagination,
+      Long userId) {
+    var transactions = getTransactionsByDateAndWallet(filter, pagination, userId);
+    return transactionService.getPageTransactionCategoryDetails(transactions.getContent());
+  }
 
-    // Apply a cache of a few minutes to avoid hitting the database too often
-    var transactions = getTransactionsByDateAndWallet(minDate, maxDate, walletId, userId);
+  public AccountingSummaryDTO getTransactionSummary(TransactionFilterDTO filter, Long userId) {
+    var transactions = getAllTransactionsByDateAndWallet(filter, userId);
 
     // Get current wallet balance
-    Double balance = walletId != null ? walletService.getCurrentBalance(walletId) : null;
+    Double balance = filter.walletId() != null ? walletService.getCurrentBalance(filter.walletId()) : null;
 
     return transactionService.getTransactionSummary(transactions, balance);
   }
 
-  private List<gse.home.personalmanager.accounting.domain.model.Transaction> getTransactionsByDateAndWallet(
-      LocalDate minDate, LocalDate maxDate, Long walletId, Long userId) {
-    return repository.findAllByDateBetweenAndWalletIdAndUserId(minDate, maxDate, walletId, userId);
+  private List<Transaction> getAllTransactionsByDateAndWallet(
+      TransactionFilterDTO filter, Long userId) {
+    return repository.findAllByDateBetweenAndWalletIdAndUserId(filter.minDate(), filter.maxDate(),
+        filter.walletId(), userId);
+  }
+
+  private Page<Transaction> getTransactionsByDateAndWallet(
+      TransactionFilterDTO filter, PaginationDTO pagination, Long userId) {
+    PageRequest pageRequest = PageRequest.of(pagination.page(), pagination.size());
+    return repository.findAllByDateBetweenAndWalletIdAndUserId(filter.minDate(), filter.maxDate(),
+        filter.walletId(),
+        userId, pageRequest);
   }
 
   public Integer importCSVRows(List<TransactionCSVRowDTO> csvRowDTOList, Long walletId, Long userId) {
@@ -103,17 +123,18 @@ public class TransactionUseCaseService {
   public void updateTransactionToCategorize(TransactionDTO transactionDTO) {
     repository.findById(transactionDTO.getId())
         .ifPresent(transaction -> {
-          // Update category if categoryId is provided or extract from nested category object
+          // Update category if categoryId is provided or extract from nested category
+          // object
           Integer categoryId = transactionDTO.getCategoryId();
           if (categoryId == null && transactionDTO.getCategory() != null) {
             categoryId = transactionDTO.getCategory().getId();
           }
-          
+
           if (categoryId != null) {
             categoryRepository.findById(categoryId)
                 .ifPresent(transaction::setCategory);
           }
-          
+
           transaction.setCustomLabel(transactionDTO.getCustomLabel());
           repository.save(transaction);
         });
@@ -125,5 +146,9 @@ public class TransactionUseCaseService {
 
   public void deleteTransaction(int id) {
     repository.deleteById(id);
+  }
+
+  public void deleteTransactionsForWallet(Long walletId, Long currentUserId) {
+    repository.deleteAllByWalletIdAndUserId(walletId, currentUserId);
   }
 }

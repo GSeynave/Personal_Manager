@@ -10,15 +10,15 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface WalletMapper {
 
-    @Mapping(source = "owner.id", target = "ownerId")
-    @Mapping(source = "owner.email", target = "ownerEmail")
-    @Mapping(source = "tenant.id", target = "tenantId")
-    @Mapping(source = "tenant.name", target = "tenantName")
-    WalletDTO toDto(Wallet wallet);
+  @Mapping(source = "owner.id", target = "ownerId")
+  @Mapping(source = "owner.email", target = "ownerEmail")
+  @Mapping(source = "tenant.id", target = "tenantId")
+  WalletDTO toDto(Wallet wallet);
 
-    @Mapping(source = "wallet.id", target = "walletId")
-    @Mapping(source = "wallet.name", target = "walletName")
-    @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "user.email", target = "userEmail")
-    WalletPermissionDTO toDto(WalletPermission permission);
+  @Mapping(source = "wallet.id", target = "walletId")
+  @Mapping(source = "wallet.name", target = "walletName")
+  @Mapping(source = "user.id", target = "userId")
+  @Mapping(source = "user.email", target = "userEmail")
+  @Mapping(source = "rolePermission", target = "role")
+  WalletPermissionDTO toDto(WalletPermission permission);
 }

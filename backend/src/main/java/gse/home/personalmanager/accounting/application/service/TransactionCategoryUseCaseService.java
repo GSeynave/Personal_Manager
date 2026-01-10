@@ -49,7 +49,7 @@ public class TransactionCategoryUseCaseService {
   @Transactional
   public TransactionCategoryDTO createCategory(CreateTransactionCategoryRequest request) {
     log.info("Creating transaction category: {}", request.getTitle());
-    
+
     // Check if title already exists
     if (repository.existsByTitle(request.getTitle())) {
       throw new IllegalArgumentException("Transaction category with title '" + request.getTitle() + "' already exists");
@@ -64,27 +64,29 @@ public class TransactionCategoryUseCaseService {
     // Set parent category if provided
     if (request.getParentCategoryId() != null) {
       TransactionCategory parentCategory = repository.findById(request.getParentCategoryId())
-          .orElseThrow(() -> new IllegalArgumentException("Parent category not found with id: " + request.getParentCategoryId()));
+          .orElseThrow(() -> new IllegalArgumentException(
+              "Parent category not found with id: " + request.getParentCategoryId()));
       category.setParentCategory(parentCategory);
     }
 
     TransactionCategory savedCategory = repository.save(category);
     log.info("Transaction category created successfully with id: {}", savedCategory.getId());
-    
+
     return mapper.toDto(savedCategory);
   }
 
   @Transactional
   public TransactionCategoryDTO updateCategory(Integer id, UpdateTransactionCategoryRequest request) {
     log.info("Updating transaction category with id: {}", id);
-    
+
     TransactionCategory category = repository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("Transaction category not found with id: " + id));
 
     // Check if title is being changed and if new title already exists
     if (request.getTitle() != null && !request.getTitle().equals(category.getTitle())) {
       if (repository.existsByTitle(request.getTitle())) {
-        throw new IllegalArgumentException("Transaction category with title '" + request.getTitle() + "' already exists");
+        throw new IllegalArgumentException(
+            "Transaction category with title '" + request.getTitle() + "' already exists");
       }
       category.setTitle(request.getTitle());
     }
@@ -106,34 +108,36 @@ public class TransactionCategoryUseCaseService {
       if (request.getParentCategoryId().equals(id)) {
         throw new IllegalArgumentException("Category cannot be its own parent");
       }
-      
+
       // Check for circular reference
       if (wouldCreateCircularReference(id, request.getParentCategoryId())) {
         throw new IllegalArgumentException("Cannot set parent category: would create circular reference");
       }
-      
+
       TransactionCategory parentCategory = repository.findById(request.getParentCategoryId())
-          .orElseThrow(() -> new IllegalArgumentException("Parent category not found with id: " + request.getParentCategoryId()));
+          .orElseThrow(() -> new IllegalArgumentException(
+              "Parent category not found with id: " + request.getParentCategoryId()));
       category.setParentCategory(parentCategory);
     }
 
     TransactionCategory updatedCategory = repository.save(category);
     log.info("Transaction category updated successfully with id: {}", updatedCategory.getId());
-    
+
     return mapper.toDto(updatedCategory);
   }
 
   @Transactional
   public void deleteCategory(Integer id) {
     log.info("Deleting transaction category with id: {}", id);
-    
+
     TransactionCategory category = repository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("Transaction category not found with id: " + id));
 
     // Check if category has subcategories
     List<TransactionCategory> subCategories = repository.findAllByParentCategoryId(id);
     if (!subCategories.isEmpty()) {
-      throw new IllegalArgumentException("Cannot delete category with subcategories. Please delete or reassign subcategories first.");
+      throw new IllegalArgumentException(
+          "Cannot delete category with subcategories. Please delete or reassign subcategories first.");
     }
 
     repository.delete(category);
@@ -147,8 +151,8 @@ public class TransactionCategoryUseCaseService {
         return true;
       }
       TransactionCategory parent = repository.findById(currentParentId).orElse(null);
-      currentParentId = parent != null && parent.getParentCategory() != null ? 
-          parent.getParentCategory().getId() : null;
+      currentParentId = parent != null && parent.getParentCategory() != null ? parent.getParentCategory().getId()
+          : null;
     }
     return false;
   }

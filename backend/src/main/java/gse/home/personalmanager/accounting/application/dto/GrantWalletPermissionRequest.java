@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GrantWalletPermissionRequest {
-    @NotNull(message = "User ID is required")
-    private Long userId;
-    
-    @NotNull(message = "Role is required")
-    private WalletRole role;
+  @NotNull(message = "User ID is required")
+  private Long userId;
+
+  @NotNull(message = "Role is required")
+  private WalletRole role;
 }

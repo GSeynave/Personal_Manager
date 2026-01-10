@@ -1,17 +1,32 @@
 package gse.home.personalmanager.accounting.application;
 
-import gse.home.personalmanager.accounting.application.dto.*;
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import gse.home.personalmanager.accounting.application.dto.AccountingSummaryDTO;
+import gse.home.personalmanager.accounting.application.dto.PaginationDTO;
+import gse.home.personalmanager.accounting.application.dto.TransactionCSVRowDTO;
+import gse.home.personalmanager.accounting.application.dto.TransactionDTO;
+import gse.home.personalmanager.accounting.application.dto.TransactionFilterDTO;
+import gse.home.personalmanager.accounting.application.dto.TransactionPageDTO;
+import gse.home.personalmanager.accounting.application.dto.TransactionPageRequestDTO;
+import gse.home.personalmanager.accounting.application.dto.TransactionSummaryDTO;
+import gse.home.personalmanager.accounting.application.dto.UncategorizedTransactionDTO;
 import gse.home.personalmanager.accounting.application.service.TransactionUseCaseService;
 import gse.home.personalmanager.user.domain.model.AppUserPrincipal;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -21,26 +36,45 @@ public class TransactionController {
 
   TransactionUseCaseService useCaseService;
 
-  @GetMapping
-  public ResponseEntity<List<TransactionSummaryDTO>> getTransactions(
+  /**
+   * Retrieves all transactions flat .
+   * This is used to display them in the transaction list screen.
+   */
+  @PostMapping
+  public ResponseEntity<TransactionPageDTO> getTransactions(
       @AuthenticationPrincipal AppUserPrincipal principal,
-      @RequestParam LocalDate minDate,
-      @RequestParam LocalDate maxDate,
-      @RequestParam Long walletId) {
-    log.debug("Request to get all transactions from {} to {} for wallet {}", minDate, maxDate, walletId);
+      @RequestBody TransactionPageRequestDTO pageRequest) {
+    log.debug("Request to get all transactions with : {} and userId : {}", pageRequest, principal.getUser().getId());
     return ResponseEntity
-        .ok(useCaseService.getAllTransactions(minDate, maxDate, walletId, principal.getUser().getId()));
+        .ok(useCaseService.getAllTransactions(pageRequest, principal.getUser().getId()));
   }
 
+  /**
+   * Retrieves all transactions summary tree format (folder)
+   * This is used to display them in the accounting overview screen.
+   */
+  @GetMapping("/overview")
+  public ResponseEntity<List<TransactionSummaryDTO>> getOverview(
+      @AuthenticationPrincipal AppUserPrincipal principal,
+      @RequestParam TransactionFilterDTO filter,
+      @RequestParam PaginationDTO pagination) {
+    log.debug("Request to get all transactions with filter : {} and pagination : {}", filter, pagination);
+    return ResponseEntity
+        .ok(useCaseService.getTransactionsOverview(filter, pagination, principal.getUser().getId()));
+  }
+
+  /**
+   * Retrieves transaction summary for a given date range and wallet.
+   * This is used to display the summary information in the accounting dashboard.
+   * expenses, income, net total, balance.
+   */
   @GetMapping("/summary")
   public ResponseEntity<AccountingSummaryDTO> getTransactionSummary(
       @AuthenticationPrincipal AppUserPrincipal principal,
-      @RequestParam LocalDate minDate,
-      @RequestParam LocalDate maxDate,
-      @RequestParam Long walletId) {
-    log.debug("Request to get transaction summary from {} to {} for wallet {}", minDate, maxDate, walletId);
+      @RequestParam TransactionFilterDTO filter) {
+    log.debug("Request to get transaction summary with:{}", filter);
     return ResponseEntity
-        .ok(useCaseService.getTransactionSummary(minDate, maxDate, walletId, principal.getUser().getId()));
+        .ok(useCaseService.getTransactionSummary(filter, principal.getUser().getId()));
   }
 
   @PostMapping("/csv")

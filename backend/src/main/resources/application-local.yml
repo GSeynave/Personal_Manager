@@ -22,4 +22,6 @@ logging:
     root: DEBUG
     org.hibernate.SQL: DEBUG
     gse.home.personalmanager: TRACE
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %clr(%-5level) %clr(%-40.40logger{39}){cyan} : %msg%n"
 

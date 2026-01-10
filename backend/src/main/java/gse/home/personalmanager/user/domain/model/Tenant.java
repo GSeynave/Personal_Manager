@@ -12,19 +12,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class Tenant {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private String name;
+  @CreatedDate
+  private Long createdAt;
 
-    @Column(length = 500)
-    private String description;
-
-    @CreatedDate
-    private Long createdAt;
-
-    @LastModifiedDate
-    private Long updatedAt;
+  @LastModifiedDate
+  private Long updatedAt;
 }

@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WalletPermissionDTO {
-    private Long id;
-    private Long walletId;
-    private String walletName;
-    private Long userId;
-    private String userEmail;
-    private WalletRole role;
-    private Long createdAt;
+  private Long id;
+  private Long walletId;
+  private String walletName;
+  private Long userId;
+  private String userEmail;
+  private WalletRole role;
+  private Long createdAt;
 }

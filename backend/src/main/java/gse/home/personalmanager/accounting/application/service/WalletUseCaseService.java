@@ -29,6 +29,7 @@ public class WalletUseCaseService {
   private final WalletRepository walletRepository;
   private final UserRepository userRepository;
   private final WalletMapper walletMapper;
+  private final TransactionUseCaseService transactionUseCaseService;
 
   /**
    * Creates a new wallet for the current user
@@ -81,6 +82,8 @@ public class WalletUseCaseService {
     AppUser currentUser = userRepository.findById(currentUserId)
         .orElseThrow(() -> new ResourceNotFoundException("User", currentUserId));
 
+    // before deleteting the wallet we needto delete all associated transactions
+    transactionUseCaseService.deleteTransactionsForWallet(walletId, currentUserId);
     walletService.deleteWallet(walletId, currentUser);
 
     log.info("Wallet deleted successfully: id={}", walletId);

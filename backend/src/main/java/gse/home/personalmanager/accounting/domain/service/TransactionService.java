@@ -28,7 +28,7 @@ public class TransactionService {
   private final WalletRepository walletRepository;
   private final UserRepository userRepository;
 
-  public List<TransactionSummaryDTO> getTransactionCategoryDetails(List<Transaction> transactions) {
+  public List<TransactionSummaryDTO> getPageTransactionCategoryDetails(List<Transaction> transactions) {
     // Filter out transactions without category
     List<Transaction> categorizedTransactions = transactions.stream()
         .filter(t -> t.getCategory() != null)
@@ -73,19 +73,19 @@ public class TransactionService {
 
       for (Map.Entry<TransactionCategory, List<Transaction>> subEntry : subCategories.entrySet()) {
         TransactionCategory subCategory = subEntry.getKey();
-        
+
         // Check if this subcategory belongs to current root category
-        if (subCategory.getParentCategory() != null && 
+        if (subCategory.getParentCategory() != null &&
             subCategory.getParentCategory().getId() == rootCategory.getId()) {
-          
+
           List<Transaction> subTransactions = subEntry.getValue();
-          
+
           var subExpense = subTransactions.stream()
               .filter(t -> TransactionType.DEBIT.equals(t.getType()))
               .mapToDouble(Transaction::getAmount)
               .map(Math::abs)
               .sum();
-          
+
           var subIncome = subTransactions.stream()
               .filter(t -> TransactionType.CREDIT.equals(t.getType()))
               .mapToDouble(Transaction::getAmount)
@@ -103,7 +103,7 @@ public class TransactionService {
           subSummary.setTotalExpense(subExpense);
           subSummary.setTotalIncome(subIncome);
           subSummary.setNestedTransactionSummaries(new ArrayList<>());
-          
+
           nestedSummaries.add(subSummary);
         }
       }
@@ -114,7 +114,7 @@ public class TransactionService {
           .mapToDouble(Transaction::getAmount)
           .map(Math::abs)
           .sum();
-      
+
       var rootIncome = rootTransactions.stream()
           .filter(t -> TransactionType.CREDIT.equals(t.getType()))
           .mapToDouble(Transaction::getAmount)
@@ -137,23 +137,24 @@ public class TransactionService {
       result.add(rootSummary);
     }
 
-    // Add orphan subcategories (subcategories whose parent is not in the transaction set)
+    // Add orphan subcategories (subcategories whose parent is not in the
+    // transaction set)
     for (Map.Entry<TransactionCategory, List<Transaction>> subEntry : subCategories.entrySet()) {
       TransactionCategory subCategory = subEntry.getKey();
-      
+
       // Check if parent category exists in root categories
       boolean parentExists = rootCategories.keySet().stream()
           .anyMatch(root -> root.getId() == subCategory.getParentCategory().getId());
-      
+
       if (!parentExists) {
         List<Transaction> orphanTransactions = subEntry.getValue();
-        
+
         var orphanExpense = orphanTransactions.stream()
             .filter(t -> TransactionType.DEBIT.equals(t.getType()))
             .mapToDouble(Transaction::getAmount)
             .map(Math::abs)
             .sum();
-        
+
         var orphanIncome = orphanTransactions.stream()
             .filter(t -> TransactionType.CREDIT.equals(t.getType()))
             .mapToDouble(Transaction::getAmount)
@@ -168,7 +169,7 @@ public class TransactionService {
         orphanSummary.setTotalExpense(orphanExpense);
         orphanSummary.setTotalIncome(orphanIncome);
         orphanSummary.setNestedTransactionSummaries(new ArrayList<>());
-        
+
         result.add(orphanSummary);
       }
     }
@@ -187,7 +188,7 @@ public class TransactionService {
         expense.getAndUpdate(v -> v + Math.abs(t.getAmount()));
       }
     });
-    
+
     return new AccountingSummaryDTO(
         BigDecimal.valueOf(income.get()).setScale(2, RoundingMode.CEILING).doubleValue(),
         BigDecimal.valueOf(expense.get()).setScale(2, RoundingMode.CEILING).doubleValue(),
@@ -196,20 +197,21 @@ public class TransactionService {
         balance);
   }
 
-  public List<Transaction> fromCSVRowToTransactionList(List<TransactionCSVRowDTO> csvRowDTOS, Long walletId, Long userId) {
+  public List<Transaction> fromCSVRowToTransactionList(List<TransactionCSVRowDTO> csvRowDTOS, Long walletId,
+      Long userId) {
     var wallet = walletRepository.findById(walletId)
         .orElseThrow(() -> new IllegalArgumentException("Wallet not found: " + walletId));
     var user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
-    
+
     return csvRowDTOS.stream()
         .map(csvRow -> csvToTransaction(csvRow, wallet, user))
         .toList();
   }
 
-  private Transaction csvToTransaction(TransactionCSVRowDTO csvRowDTO, 
-                                       gse.home.personalmanager.accounting.domain.model.Wallet wallet,
-                                       gse.home.personalmanager.user.domain.model.AppUser user) {
+  private Transaction csvToTransaction(TransactionCSVRowDTO csvRowDTO,
+      gse.home.personalmanager.accounting.domain.model.Wallet wallet,
+      gse.home.personalmanager.user.domain.model.AppUser user) {
     var transaction = new Transaction();
     transaction.setAmount(csvRowDTO.getAmount());
     transaction.setType(csvRowDTO.getAmount() > 0 ? TransactionType.CREDIT : TransactionType.DEBIT);

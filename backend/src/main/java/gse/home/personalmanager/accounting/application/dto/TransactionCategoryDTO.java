@@ -12,6 +12,5 @@ public class TransactionCategoryDTO {
   private String icon;
   private Double expectedAmount;
   private Integer parentCategoryId;
-  private String parentCategoryTitle;
   private List<TransactionCategoryDTO> subCategories;
 }

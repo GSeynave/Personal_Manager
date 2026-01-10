@@ -37,3 +37,4 @@ gamification:
     instant-completion-cooldown-minutes: 1
   diminishing-returns:
     enabled: true
+
